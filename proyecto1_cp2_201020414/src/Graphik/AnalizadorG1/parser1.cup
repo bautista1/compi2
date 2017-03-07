@@ -1,0 +1,174 @@
+package fase1;
+import java_cup.runtime.*;
+import java.util.LinkedList;
+//import lienzoBAT.ErrorSin;
+import java_cup.runtime.Symbol;
+import arbol.*;
+//import lienzoBAT.Errores;
+//import proyecto1_201020414.pantalla;
+
+parser code
+{:
+public NodoArbol codigoG;
+public NodoArbol gramaticaG;
+public NodoArbol declaracionG;
+public NodoArbol raizG;
+/**Metodo al que se llama automáticamente ante algún error sintactico.*/
+public void syntax_error(Symbol s){
+System.out.println("No se pudo recuperar del error " + (s.right+1)+ "Columna "+s.left+". Identificador " + s.value + " no reconocido.");
+// pantalla.errorLexLienzo(String.valueOf(s.value),String.valueOf(s.left),String.valueOf(s.right+1),"Sintactico"); 
+
+}
+/**Metodo al que se llama en el momento en que ya no es posible una recuperación de errores.*/
+public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{
+System.out.println("No se pudo recuperar del error " + (s.right+1)+ "Columna "+s.left+". Identificador " + s.value + " no reconocido.");
+// pantalla.errorLexLienzo(String.valueOf(s.value),String.valueOf(s.left),String.valueOf(s.right+1),"Sintactico"); 
+}
+/*Metodo que uso para verificar si el color es repetido*/
+
+:}
+action code
+{:
+
+
+:}
+/*Declaracion de simbolos terminales*/
+terminal varL,enteroL,decimalL,caracterL,cadenaL,boolL,vacioL;
+terminal publicoL,protegidoL,privadoL;
+terminal import,alsL,llamarL,newL,llamarhkL,heredaL,retornarL,mainL,incluirHK,llamarHKL;
+terminal ifL,elseL,switchL,caseL,defaultL,forL,whileL,doL;
+terminal continueL,breakL,graficar,voidL,columnaL,dondeL,dondeCadaL,dondeTodoL,printL;
+
+
+terminal punto,parA,parC,llaveA,llaveC,corA,corC;
+terminal coma,dosPuntos,asignacion,delimitador;
+terminal notLogico,yLogico,oLogico,xorLogico;
+terminal comparacion,distinto,mayorIgual,menorIgual,mayor,menor;
+terminal suma,resta,por,div,pot,mod,disminucion,aumento,indice,dolar,archivoGK;
+terminal num,decimal,id,caracter,cadena;
+
+
+/*Declaracion de simbolos NO terminales*/
+
+non terminal Object INICIAL, IMPORTACIONES, IMPORTACION,IMPORTARHK,IMPORTHK,CREARALS,CUERPOSALS,CUERPOALS;
+non terminal Object VARIABLES, VARIABLE,LIDS,ATRIBUTOS,FUNCIONES,LPARAMETROS,CUERPOFUNCIONES,CUERPO,VISIBILIDAD;
+non terminal Object RETORNO,VARIABLE,LLAMARFUNCION,PARAMETROSV,LLAMARHK,ASIGNACION,SI,SINO,SWITCH,CASOS,CASO,FOR,CONDICIONFOR,INCREMENTOFOR;
+non terminal Object WHILE,DOWHILE;
+//************************************Asignacion de precedencias******************************************
+
+start with INICIAL;
+
+INICIAL ::= IMPORTACIONES IMPORTARHK
+{:
+
+:}
+IMPORTACIONES::=IMPORTACIONES IMPORTACION
+            | IMPORTACION
+            ;
+
+IMPORTACION:= import id archivoGK
+;
+
+IMPORTARHK::=LLAMADASHK IMPORTHK
+          | IMPORTHK
+;
+
+IMPORTHK::=incluirHK id delimitador
+;
+
+CUERPOSALS::=CUERPOSALS CREARALS
+    |CREARALS
+;
+
+
+CREARALS::=alsL id dosPuntos TVISIBILIDAD llaveA CUERPOSALS llaveC
+          |alsL id heredaL id dosPuntos TVISIBILIDAD llaveA CUERPOSALS llaveC
+;
+
+CUERPOSALS::=CUERPOSALS CUERPOASL
+            |CUERPOASL
+;
+
+CUERPOASL::=ATRIBUTOS
+            |FUNCIONES
+;
+
+ATRIBUTOS::=varL TDATO LIDS asignacion OP VISIBILIDAD delimitador
+          |varL TDATO LIDS VISIBILIDAD delimitador
+;
+
+LIDS::=LIDS coma id
+      |id
+;
+
+FUNCIONES::=TDATO id parA LPARAMETROS parC VISIBILIDAD llaveA CUERPOFUNCIONES llaveC
+            |vacioL mainL parA parC llaveA CUERPOFUNCIONES llaveC
+;
+
+VISIBILIDAD::= dosPuntos TVISIBLE
+              |VACIO
+;
+LPARAMETROS::=LPARAMETROS coma TDATO id
+              |TDATO id
+              |VACIO
+;
+CUERPOFUNCIONES::=CUERPOFUNCIONES CUERPO
+                |CUERPO
+;
+
+CUERPO::=RETORNO
+                  |VARIABLE
+                  |LLAMARFUNCION
+                  |LLAMARHK
+                  |ASIGNACION
+                  |SI
+                  |SWITCH
+                  |FOR
+                  |WHILE
+                  |DOWHILE
+;
+
+DOWHILE::=doL llaveA CUERPOFUNCIONES llaveC whileL parA OP parC delimitador
+;
+WHILE::=whileL parA OP parC llaveA CUERPOFUNCIONES llaveC
+;
+FOR::= forL parA CONDICIONFOR dosPuntos OP dosPuntos INCREMENTOFOR parC llaveA CUERPOFUNCIONES llaveC
+;
+
+INCREMENTOFOR::=id disminucion
+                |id aumento
+;
+CONDICIONFOR::= TDATO id asignacion OP
+                |id asignacion OP
+;
+SWITCH::=switchL parA OP parC llaveA CASOS llaveC
+;
+CASOS::=CASOS CASO
+        |CASO
+;
+CASO::=caseL OP dosPuntos CUERPOFUNCIONES
+    |defaultL dosPuntos CUERPOFUNCIONES
+;
+SI::=ifL parA OP parC llaveA CUERPOFUNCIONES llaveC SINO
+;
+
+SINO::= elseL llaveA CUERPOFUNCIONES llaveC
+        |VACIO
+;
+ASIGNACION::= id asignacion OP delimitador
+;
+LLAMARHK::= llamarHk id parA PARAMETROSV parC delimitador
+;
+LLAMARFUNCION::=llamar id PARAMETROSV parA parC delimitador
+;
+PARAMETROSV::=PARAMETROSV coma OP
+              |OP
+              |VACIO
+;
+VARIABLE::=varL TDATO LIDS asignacion OP delimitador
+          |varL TDATO LIDS delimitador
+;
+RETORNO::=retornar OP delimitador
+;
+
+eduardo luna
