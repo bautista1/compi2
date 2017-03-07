@@ -1,0 +1,77 @@
+publico lienzo hola extiende prueba%
+
+conserva var entero  var1$
+var entero arreglo var2[3]$
+
+conserva entero prueba1 (cadena hol)%
+pintar_p (3,3,"#ABABAB",4)$
+pintar_p (3,3,"#ABABAB",4)$
+Pintar_OR(100,100, "#000000", 50, 100,'o') $
+Pintar_OR(100,100, "#000000", 50, 100,'r')$
+Pintar_S(100,100, "#000000", "Hola mundo")$
+?
+
+conserva entero prueba2 (cadena hol)%
+pintar_p (3,3,"#ABABAB",4)$
+pintar_p (3,3,"#ABABAB",4)$
+Pintar_OR(100,100, "#000000", 50, 100,'o') $
+Pintar_OR(100,100, "#000000", 50, 100,'r')$
+Pintar_S(100,100, "#000000", "Hola mundo")$
+?
+
+
+conserva  entero prueba3 (cadena hol)%
+>>es un si
+si(3>5)%
+var entero prueba1$
+prueba1=4+5*prueba4$
+Pintar_S(100,100, "#000000", "Hola mundo")$
+
+?sino%
+Pintar_OR(100,100, "#000000", 50, 100,'r')$
+?
+<-
+es un switch
+ ->
+comprobar(HOLI)%
+      caso 1:
+            Pintar_OR(100,100, "#000000", 50, 100,'o') $
+            salir$
+      caso 2:
+            Pintar_OR(100,100, "#000000", 50, 100,'o') $
+            salir$
+      defecto:
+            pintar_p (3,3,"#ABABAB",4)$
+            salir$
+?
+
+>>es un for
+para(i=0;i<100;i+=2)%
+  pintar_p (3,3,"#ABABAB",4)$
+?
+>>es un WHILE
+mientras(i>var1)%
+pintar_p (3,3,"#ABABAB",4)$
+?
+
+>>es un DO WHILE
+hacer%
+pintar_p (3*5,3*5,"#ABABAB",4)$
+?mientras(i>var1)$
+
+ordenar(prueba,ascendente)$
+sumarizar(prueba)$
+
+
+?
+
+principal () %
+ordenar(prueba,descendente)$
+prueba3()$
+prueba2(4,4,4)$
+dos=dos*4$
+ma[2][2][2]=ana(1,2,3,4)+3$
+
+?
+?
+

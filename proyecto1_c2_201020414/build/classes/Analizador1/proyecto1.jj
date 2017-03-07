@@ -1,0 +1,1144 @@
+options {
+   IGNORE_CASE = true;
+   STATIC = false;
+/*
+LOOKAHEAD = 1;
+CHOICE_AMBIGUITY_CHECK = 2;
+DEBUG_PARSER = false;   //enable_tracing();  disable_tracing();
+OUTPUT_DIRECTORY = //ruta
+
+*/
+   
+}
+
+PARSER_BEGIN(proyecto)
+import java.io.*;
+import arbol.*;
+public class proyecto 
+{
+
+}
+PARSER_END(proyecto)
+
+
+
+TOKEN:
+{
+	<LIENZOT:"lienzo">
+	|<EXTIENDE:"extiende">
+}
+
+
+TOKEN:
+{
+	<PUBLICO:"publico">
+	|<PRIVADO:"privado">
+	|<PROTEGIDO:"protegido">
+}
+
+TOKEN:
+{
+	<CONSERVAR:"conserva">
+	|<ARREGLO:"arreglo">
+	|<VAR:"var">
+}
+
+TOKEN:
+{
+	<RETORNO:"retorna">
+}
+
+TOKEN : 
+{ 
+	  <OR : "||">  
+	| <XOR : "&|" >
+        | <NOR : "!||" >
+	| <AND:"&&">
+        | <NAND:"!&&">
+	| <NOT:"!"> 
+        |<INICIO:"%">
+        |<FIN:"?">
+        |<DELIMITADOR:"$">
+}
+
+
+
+TOKEN : 
+{ 
+	  <ASIGNACION : "=">  
+	| <PLUS : "+" >  
+	| <MINUS:"-"> 
+	| <MULTIPLY:"*"> 
+	| <DIVIDE:"/"> 
+	| <POT:"^"> 
+	| <INCR: "+=" > 
+	| <DECR: "-=" > 
+	
+}
+TOKEN:
+{
+	 <IF: "si" > 
+	| <ELSE:"sino" > 
+	| <FOR:"para" > 
+	| <CONTINUE:"continuar" >
+	| <SWITCH:"comprobar" > 
+	| <CASE:"caso" > 
+	| <SALIR:"salir" > 
+	| <DEFAUL:"defecto">
+	| <WHILE:"mientras">
+        | <DO:"hacer" >
+	| <PUNTO: "pintar_p">
+        | <PINTAROR:"pintar_or" >
+        | <PINTARCAD:"pintar_s" >
+        | <ORDENAR:"ordenar" >
+        | <SUMARIZAR:"sumarizar" >
+        | <MAIN:"principal" >
+        | <VERDADERO:"verdadero" >   
+        | <FALSO:"falso" >
+        | <ASCENDENTE:"ascendente" >
+        | <DESCENDENTE:"descendente" >
+        | <PARES:"pares" >
+        | <IMPARES:"impares" >
+        | <PRIMOS:"primos" >
+        | <FIGURA:("\'" "o" "\'" | "\'" "r" "\'") >
+}
+
+
+TOKEN:
+{
+      <PARA: "(" > 
+	| <PARC: ")" > 
+	| <LLAVEA: "{" > 
+	| <LLAVEC: "}" > 
+	| <CORA: "[" > 
+	| <CORC: "]" > 
+	| <COMA: "," > 
+        | <DOSPUNTOS: ":" > 
+        | <PCOMA: ";" > 
+	
+}
+TOKEN:
+{
+	  <EQUIVALENCIA: "==" > 
+	| <MENORIGUAL: "<=" > 
+	| <MENORQ: "<" > 
+	| <MAYORIGUAL: ">=" > 
+	| <MAYORQ: ">" > 
+        | <DISTINTO: "!=" > 
+        | <NULO: "!&¡" > 
+}
+
+
+TOKEN:
+{
+	<INTL:"entero">
+        |<FLOATL:"doble">
+	|<BOOLL:"boolean">
+        |<CHARL:"caracter">
+	|<STRINGL:"cadena">
+	| <NUM : (["0"-"9"])+>  //48
+	| <IDEN : ["a"-"z","A"-"Z"](["a"-"z","A"-"Z","0"-"9","_"])*>  //49
+	| <DECIMAL : (["0"-"9"])+["."](["0"-"9"])+ > //50
+	| <CADENA : "\""["a"-"z","A"-"Z","0"-"9"," "](["a"-"z","A"-"Z","0"-"9"," ",":",";","."])*"\""> //51
+	| <CARAC : "'"["a"-"z","A"-"Z","0"-"9"]"'" >//52 
+        | <SIMB : ["a"-"f","A"-"F","0"-"9"]>
+        | <COLOR : "\"" "#"(["a"-"f" ]|["A"-"F"]|["0"- "9"]){6,6}"\"" > 
+}
+
+SKIP : 
+{ 
+	" "
+	| "\n" 
+	| "\r" 
+	| "\r\n" 
+	| "\t" 
+	|  <">>" (~["\n","\r"])* ("\n" | "\r" | "\r\n")>
+	|  <"<-" (~["-"])* "-" ("-" | ~["-",">"] (~["-"])* "-")* ">">
+        
+}
+
+
+
+
+
+NodoArbol Programa() :
+{
+    NodoArbol raiz=new NodoArbol("Progra");
+    NodoArbol lienz=null;
+    
+    
+}
+{
+	(lienz=LIENZO(){raiz.addHijo(lienz);})+	{
+                                                          //  System.out.println("PROGRAMA");
+                                                            return raiz;
+                                                        }
+}
+
+NodoArbol LIENZO():
+{    
+    NodoArbol lien=null;
+    NodoArbol ext=null;
+    Token id;
+    NodoArbol lienzi=new NodoArbol("LIENZO");
+}
+{
+    lien=ACCESO() <LIENZOT> id=<IDEN> ext=EXTIENDE() <EOF> { 
+                        lienzi.addHijo(lien);
+                        lienzi.addHijo(id.toString());
+                        lienzi.addHijo(ext);
+                        return lienzi;
+                    }
+}
+
+NodoArbol EXTIENDE():
+{    
+    NodoArbol lien=new NodoArbol("EXTENDIDA");
+    NodoArbol vacio=null;
+    NodoArbol cu=null;
+    NodoArbol cu1=new NodoArbol ("SIMPLE");
+    NodoArbol lienzs=null;
+}
+{
+    <EXTIENDE> lienzs=LIENZOS() <INICIO> cu=CUERPO()<FIN> {lien.addHijo(lienzs);lien.addHijo(cu);return lien;}
+     |<INICIO> cu=CUERPO() <FIN> {cu1.addHijo(cu); return cu1;}
+}
+
+NodoArbol LIENZOS():
+{
+    NodoArbol acce=new NodoArbol("LIENZOS");
+    Token id;
+}
+{
+        id=<IDEN> {acce.addHijo(id.toString());}(<COMA> id=<IDEN>{acce.addHijo(id.toString());})*{return acce;}
+	
+}
+
+NodoArbol ACCESO():
+{
+    NodoArbol acce=new NodoArbol("T_ACCE");
+}
+{
+        <PUBLICO> {acce.addHijo("PUBLICO");return acce;}
+	|<PRIVADO> {acce.addHijo("PRIVADO");return acce;}
+	|<PROTEGIDO> {acce.addHijo("PROTEGIDO");return acce;}
+}
+
+NodoArbol CUERPO():
+{
+    NodoArbol acce=new NodoArbol("RELLENOP");
+    NodoArbol rell=null;
+}
+{
+        (rell=RELLENOP(){acce.addHijo(rell);})+ {return acce;}
+}
+
+NodoArbol RELLENOP():
+{    
+    NodoArbol rell=null;
+}
+{
+        
+        rell=FAC(){return rell;}
+        |rell=MAIN(){return rell;}
+        
+        
+}
+
+NodoArbol FAC():
+{    
+    NodoArbol rell=new NodoArbol("CONSERVA");
+    NodoArbol rell1=null;
+    boolean conservar=false;
+}
+{
+       [<CONSERVAR>{conservar=true;}] (
+                        
+
+                        rell1=FUNM(){
+                                    if(conservar){
+                                        rell.addHijo(rell1);
+                                        return rell;
+                                    }else{
+                                        return rell1;
+                                    }
+                                   }
+                        |rell1=DECLARACION(){
+
+                                    if(conservar){
+                                        rell.addHijo(rell1);
+                                        return rell;
+                                    }else{
+                                        return rell1;
+                                    }
+
+                            }
+                      )
+}
+
+
+NodoArbol DECLARACION():
+{    
+    NodoArbol rell=null;
+    NodoArbol tempr=null;
+}
+{
+       tempr=VAR() <DELIMITADOR> {
+                        rell=new NodoArbol("DECLARACION");               
+                        rell.addHijo(tempr);
+                        return rell;
+                }
+}
+
+NodoArbol VAR():
+{    
+    NodoArbol rell=new NodoArbol("VARIABLES");
+    NodoArbol tempr=null;
+    NodoArbol tdato=null;
+    NodoArbol comp=null;
+}
+{
+       <VAR> tdato=TDATO() comp=COMP(){
+                    rell.addHijo(tdato);
+                    rell.addHijo(comp);
+                    return rell;
+            }
+}
+
+NodoArbol COMP():
+{    
+    NodoArbol rell=new NodoArbol("VARIABLES");
+    NodoArbol vari1=new NodoArbol("LISTA_VARIABLES");
+    NodoArbol vari=null;
+    NodoArbol arr=new NodoArbol("LISTA_ARREGLOS");
+    NodoArbol arr1=null;
+}
+{
+       <ARREGLO> arr1=ARREGLOS(){arr.addHijo(arr1);}(<COMA> arr1=ARREGLOS(){arr.addHijo(arr1);})* {return arr;}
+       |vari=VARI(){vari1.addHijo(vari);}(<COMA> vari=VARI(){vari1.addHijo(vari);})*{return vari1;}
+}
+
+
+NodoArbol ARREGLOS():
+{    
+    NodoArbol rell=new NodoArbol("ARREGLO");
+    Token id;
+    NodoArbol op=null;
+    NodoArbol dim=null;
+}
+{
+      id=<IDEN> dim=DIM(){rell.addHijo(id.toString());rell.addHijo(dim);}[<ASIGNACION> op=OP(){rell.addHijo(op);}
+                ]{return rell;}
+}
+
+NodoArbol DIM():
+{    
+    NodoArbol rell=new NodoArbol("DIMENSIONES");
+    NodoArbol op=null;
+}
+{
+      <CORA> op=OP()<CORC> {rell.addHijo(op);} (<CORA> op=OP()<CORC>{rell.addHijo(op);})* {return rell;}
+}
+
+NodoArbol VARI():
+{    
+    NodoArbol rell=new NodoArbol("VARIABLE");
+    Token id;
+    NodoArbol op=null;
+}
+{
+      id=<IDEN>{rell.addHijo(id.toString());}[<ASIGNACION> op=OP(){rell.addHijo(op);}
+                ]{return rell;}
+}
+
+
+NodoArbol MAIN():
+{    
+    NodoArbol fm=null;
+    NodoArbol rell=new NodoArbol("RELLENO");
+    NodoArbol tempr=null;
+}
+{
+        <MAIN> <PARA><PARC><INICIO> (tempr=CUERPOM(){rell.addHijo(tempr);})+ <FIN>
+                {
+                            fm=new NodoArbol("MAIN");
+                            fm.addHijo(rell);
+                            return fm;
+                }
+}
+
+
+
+NodoArbol FUNM():
+{    
+    NodoArbol fm=null;
+    NodoArbol tDato=null;
+    NodoArbol parametro=null;
+    Token id;
+    String tipo="";
+    NodoArbol temp=null;
+    NodoArbol rell=new NodoArbol("RELLENO");
+    NodoArbol tempr=null;
+}
+{
+        tDato=TDATO() id=<IDEN> <PARA>parametro=PAR()<PARC><INICIO>(tempr=RELLENO(){rell.addHijo(tempr);})+<FIN>
+                {
+                    
+                        if(tDato.getEtiqueta().equalsIgnoreCase("vacio")){
+                            tipo="VOID";
+                            fm=new NodoArbol("Metodo");
+                            fm.addHijo(id.toString());
+                            fm.addHijo(parametro);
+                            fm.addHijo(rell);
+                            return fm;
+                          }else{
+                            fm=new NodoArbol("FUNCION");
+                            fm.addHijo(tDato);
+                            fm.addHijo(id.toString());
+                            fm.addHijo(parametro);
+                            fm.addHijo(rell);
+                            return fm;
+                          }
+                    
+                }
+}
+
+
+NodoArbol PAR() :
+ {
+    NodoArbol acce=new NodoArbol("PARAMETROS");
+    NodoArbol param=null;
+    NodoArbol tDato=null;
+    Token id;
+    NodoArbol vacio=null;
+}
+{
+        tDato=TDATO() id=<IDEN> {param=new NodoArbol("PARAMETRO");param.addHijo(tDato);param.addHijo(id.toString()); acce.addHijo(param);} (<COMA> tDato=TDATO() id=<IDEN>{param=new NodoArbol("PARAMETRO");param.addHijo(tDato);param.addHijo(id.toString()); acce.addHijo(param);})*
+            {
+                    return acce;
+            }
+       |vacio=EMPTY(){return vacio;}
+}
+
+NodoArbol TDATO () :
+ {
+    NodoArbol acce=null;
+    NodoArbol vacio=null;
+    
+}
+{
+        <INTL> {acce=new NodoArbol("ENTERO");return acce;}
+        |<FLOATL>{acce=new NodoArbol("DOBLE");return acce;}
+	|<BOOLL>{acce=new NodoArbol("BOOLEAN");return acce;}
+        |<CHARL>{acce=new NodoArbol("CARACTER");return acce;}
+	|<STRINGL>{acce=new NodoArbol("CADENA");return acce;}
+        |vacio=EMPTY(){return vacio;}
+}
+
+
+
+NodoArbol RELLENO():
+ {
+ NodoArbol hijo=null;
+ } 
+{ 
+    hijo=PINTARP(){return hijo;}
+    |hijo=PINTAROR(){return hijo;}
+    |hijo=PINTARC(){return hijo;}
+    |hijo=IF(){return hijo;}
+    |hijo=SWITCH(){return hijo;}
+    |hijo=FOR(){return hijo;}
+    |hijo=WHILE(){return hijo;}
+    |hijo=DOWHILE(){return hijo;}
+    |hijo=ORDENAR(){return hijo;}
+    |hijo=SUMARIZAR(){return hijo;}
+    |hijo=RETORNO(){return hijo;}
+    |hijo=DECLARACION(){return hijo;}
+    |hijo=ASIGNACION(){return hijo;}
+
+}
+
+NodoArbol ASIGNACION () :
+ {
+    NodoArbol hijo=null;
+    NodoArbol rel=null;
+    NodoArbol arreglo=new NodoArbol("DIMENSION_ARREGLO");
+    Token id;
+ } 
+{ 
+    id=<IDEN> (<ASIGNACION> rel=OP() <DELIMITADOR>
+                        {         
+                            hijo=new NodoArbol("ASIGNACION");
+                            hijo.addHijo(id.toString());
+                            hijo.addHijo(rel);
+                            return hijo;
+                        }
+                |<PARA>rel=PARAMETROSVALOR()<PARC><DELIMITADOR>
+                        {
+                         if(rel.getEtiqueta().equalsIgnoreCase("vacio")){
+                            hijo=new NodoArbol("LLAMADA_FUNM_SIN");
+                            hijo.addHijo(id.toString());
+                            return hijo;
+                          }else{
+                            hijo=new NodoArbol("LLAMADA_FUNM_CON");
+                            hijo.addHijo(id.toString());
+                            hijo.addHijo(rel);
+                            return hijo;
+                          }
+                        }
+
+                |<CORA>rel=OP()<CORC> {arreglo.addHijo(rel);} (<CORA>rel=OP()<CORC>{arreglo.addHijo(rel);})* <ASIGNACION> rel=OP() <DELIMITADOR> 
+                        {
+                            hijo=new NodoArbol("ASIGNACION_ARREGLO");
+                            hijo.addHijo(id.toString());
+                            hijo.addHijo(arreglo);
+                            hijo.addHijo(rel);
+                            return hijo;
+                        }
+              )
+}
+
+NodoArbol PARAMETROSVALOR () :
+ {
+    NodoArbol hijo=new NodoArbol("PARAMETROS_VALOR");
+    NodoArbol rel=null;
+    NodoArbol vacio=null;
+ } 
+{ 
+     rel=OP() {hijo.addHijo(rel);}(<COMA> rel=OP(){hijo.addHijo(rel);})*   {return hijo;}
+    |vacio=EMPTY(){return vacio;}
+}
+
+
+
+
+
+NodoArbol CUERPOM():
+ {
+ NodoArbol hijo=null;
+ } 
+{ 
+    hijo=PINTARP(){return hijo;}
+    |hijo=PINTAROR(){return hijo;}
+    |hijo=PINTARC(){return hijo;}
+    |hijo=IF(){return hijo;}
+    |hijo=SWITCH(){return hijo;}
+    |hijo=FOR(){return hijo;}
+    |hijo=WHILE(){return hijo;}
+    |hijo=DOWHILE(){return hijo;}
+    |hijo=ORDENAR(){return hijo;}
+    |hijo=SUMARIZAR(){return hijo;}
+    |hijo=DECLARACION(){return hijo;}
+    |hijo=ASIGNACION(){return hijo;}
+}
+
+NodoArbol RETORNO () :
+ {
+    NodoArbol hijo=new NodoArbol("RETORNO");
+    NodoArbol rel=null;
+    Token id;
+ } 
+{ 
+    <RETORNO> rel=OP() <DELIMITADOR>
+                        {         
+                            hijo.addHijo(rel);
+                             return hijo;
+                        }
+}
+
+NodoArbol SUMARIZAR () :
+ {
+    NodoArbol hijo=new NodoArbol("SUMARIZAR");
+    NodoArbol rel=null;
+    Token id;
+ } 
+{ 
+    <SUMARIZAR><PARA> rel=OP() <PARC><DELIMITADOR>
+                        {         
+                            hijo.addHijo(rel);
+                             return hijo;
+                        }
+}
+
+NodoArbol ORDENAR () :
+ {
+ NodoArbol hijo=new NodoArbol("ORDENAR");
+NodoArbol rel=null;
+Token id;
+ } 
+{ 
+    <ORDENAR><PARA> id=<IDEN> <COMA> rel=TIPOORDEN()<PARC><DELIMITADOR>
+                        {         
+                            hijo.addHijo(id.toString());
+                             hijo.addHijo(rel);
+                             return hijo;
+                        }
+}
+
+NodoArbol TIPOORDEN () :
+ {
+ NodoArbol hijo=null;
+ } 
+{ 
+    <ASCENDENTE> {hijo=new NodoArbol("ASCENDENTE");return hijo;}
+    |<DESCENDENTE> {hijo=new NodoArbol("DESCENDENTE");return hijo;}
+    |<PARES> {hijo=new NodoArbol("PARES");return hijo;}
+    |<IMPARES> {hijo=new NodoArbol("IMPARES");return hijo;}
+    |<PRIMOS> {hijo=new NodoArbol("PRIMOS");return hijo;}
+}
+
+
+
+
+NodoArbol DOWHILE () :
+ {
+ NodoArbol hijo=new NodoArbol("DO_WHILE");
+NodoArbol relleno=new NodoArbol("RELLENO");
+NodoArbol rel=null;
+NodoArbol comparacion=null;
+ } 
+{ 
+    <DO><INICIO>(rel=CUERPOCID(){relleno.addHijo(rel);})+<FIN><WHILE> <PARA> comparacion=OP() <PARC> <DELIMITADOR>
+                        {         
+                            hijo.addHijo(relleno);
+                             hijo.addHijo(comparacion);
+                             return hijo;
+                        }
+}
+
+NodoArbol WHILE () :
+ {
+ NodoArbol hijo=new NodoArbol("WHILE");
+NodoArbol relleno=new NodoArbol("RELLENO");;
+NodoArbol rel=null;
+NodoArbol comparacion=null;
+ } 
+{ 
+    <WHILE> <PARA> comparacion=OP() <PARC> <INICIO>(rel=CUERPOCID(){relleno.addHijo(rel);})+<FIN>
+                        {         
+                             hijo.addHijo(comparacion);
+                             hijo.addHijo(relleno);
+                             return hijo;
+                        }
+}
+
+
+
+NodoArbol FOR () :
+ {
+ NodoArbol hijo=new NodoArbol("FOR");
+NodoArbol relleno=new NodoArbol("RELLENO");;
+NodoArbol rel=null;
+NodoArbol op=null;
+NodoArbol comparacion=null;
+NodoArbol aumento=null;
+ } 
+{ 
+    <FOR> <PARA> op=ASIGNACIONFOR() <PCOMA>comparacion=OP()<PCOMA> aumento=OPFOR() <PARC> <INICIO>(rel=CUERPOCID(){relleno.addHijo(rel);})+<FIN>
+                        {         
+                             hijo.addHijo(op);
+                             hijo.addHijo(comparacion);
+                             hijo.addHijo(aumento);
+                             hijo.addHijo(relleno);
+                             return hijo;
+                        }
+}
+
+NodoArbol OPFOR () :
+ {
+ NodoArbol hijo=new NodoArbol("INCREMENTO");
+NodoArbol relleno=new NodoArbol("DECREMENTO");;
+NodoArbol op=null;
+NodoArbol tdato=null;
+Token id;
+ } 
+{ 
+    id=<IDEN> (<INCR> op=OP() {hijo.addHijo(id.toString());hijo.addHijo(op);return hijo;}
+    | <DECR> op=OP(){relleno.addHijo(id.toString());relleno.addHijo(op);return relleno;}
+        )
+}
+
+
+
+NodoArbol ASIGNACIONFOR () :
+ {
+ NodoArbol hijo=new NodoArbol("ASIGNACION");
+NodoArbol relleno=new NodoArbol("VARIABLE");;
+NodoArbol op=null;
+NodoArbol tdato=null;
+Token id;
+ } 
+{ 
+    id=<IDEN> <ASIGNACION> op=OP() {hijo.addHijo(id.toString());hijo.addHijo(op); return hijo;}
+    |tdato=TDATO() id=<IDEN> <ASIGNACION> op=OP() {relleno.addHijo(tdato);relleno.addHijo(id.toString());relleno.addHijo(op); return relleno;}
+    
+}
+
+
+NodoArbol CUERPOCID () :
+ {
+ NodoArbol hijo=new NodoArbol("BREAK");
+NodoArbol relleno=new NodoArbol("CONTINUAR");
+NodoArbol op=null;
+ } 
+{ 
+    op=RELLENO(){return op;}
+    |<SALIR> <DELIMITADOR>{return hijo;}
+    |<CONTINUE> <DELIMITADOR> {return relleno;}
+}
+
+
+
+
+NodoArbol SWITCH () :
+ {
+ NodoArbol hijo=new NodoArbol("SWITCH");
+NodoArbol relleno=new NodoArbol("CASOS");;
+NodoArbol caso=null;
+NodoArbol opi=null;
+Token id;
+ } 
+{ 
+    <SWITCH> <PARA> opi=OP() <PARC> <INICIO>(caso=CASO(){relleno.addHijo(caso);})+<FIN>
+                        {         
+                             hijo.addHijo(opi);
+                             hijo.addHijo(relleno);
+                             return hijo;
+                        }
+}
+
+NodoArbol CASO () :
+ {
+ NodoArbol hijo=null;
+NodoArbol relleno=new NodoArbol("RELLENO");;
+NodoArbol rel=null;
+NodoArbol op=null;
+ } 
+{ 
+    <CASE> op=OP() <DOSPUNTOS> (rel=CUERPOD(){relleno.addHijo(rel);})+
+                        {         
+                             hijo=new NodoArbol("CASO");
+                             hijo.addHijo(op);
+                             hijo.addHijo(relleno);
+                             return hijo;
+                        }
+    |<DEFAUL> <DOSPUNTOS>  (rel=CUERPOD(){relleno.addHijo(rel);})+
+                        {
+                             hijo=new NodoArbol("DEFAULT");
+                             hijo.addHijo(relleno);
+                             return hijo;
+                        }
+}
+
+NodoArbol CUERPOD () :
+ {
+NodoArbol relleno=new NodoArbol("BREAK");
+NodoArbol op=null;
+ } 
+{ 
+    <SALIR> <DELIMITADOR>{return relleno;}
+    |op=RELLENO(){return op;}
+}
+
+NodoArbol IF () :
+ {
+ NodoArbol hijo=new NodoArbol("IF");
+NodoArbol operacion=null;
+NodoArbol relleno=new NodoArbol("RELLENO");;
+NodoArbol sino=null;
+NodoArbol rel=null;
+ } 
+{ 
+    <IF> <PARA> operacion=OP() <PARC> <INICIO>(rel=RELLENO(){relleno.addHijo(rel);})+<FIN> sino=SINO() 
+                        {         
+                             hijo.addHijo(operacion);
+                             hijo.addHijo(relleno);
+                             hijo.addHijo(sino);
+                             return hijo;
+                        }
+}
+NodoArbol SINO () :
+ {
+ NodoArbol hijo=new NodoArbol("SINO");
+NodoArbol cuerpo=null;
+NodoArbol relleno=new NodoArbol("RELLENO");
+ } 
+{ 
+    <ELSE><INICIO>(cuerpo=RELLENO(){relleno.addHijo(cuerpo);})+<FIN>
+                        {           
+                             hijo.addHijo(relleno);
+                             return hijo;
+                        }
+   |cuerpo=EMPTY(){return cuerpo;}
+}
+NodoArbol PINTARP () :
+ {
+NodoArbol hijo=new NodoArbol("PINTAR_PUNTO");
+NodoArbol x=null;
+NodoArbol y=null;
+NodoArbol diametro=null;
+Token color;
+ } 
+{ 
+    <PUNTO><PARA>x=OP() <COMA> y=OP() <COMA>color=<COLOR> <COMA>diametro=OP() <PARC><DELIMITADOR>
+                        {
+                            String he=color.toString();
+                            he=he.replace("\"", "");                
+                             hijo.addHijo(x);
+                             hijo.addHijo(y);
+                             hijo.addHijo(he);
+                             hijo.addHijo(diametro);
+                             return hijo;
+                        }
+}
+NodoArbol PINTARC () :
+ {
+ NodoArbol hijo=new NodoArbol("PINTAR_CADENA");
+NodoArbol x=null;
+NodoArbol y=null;
+NodoArbol diametro=null;
+Token color;
+ } 
+{ 
+    <PINTARCAD> <PARA>x=OP() <COMA> y=OP() <COMA>color=<COLOR> <COMA>diametro=OP() <PARC> <DELIMITADOR>
+                        {
+                            String he=color.toString();
+                            he=he.replace("\"", "");                
+                             hijo.addHijo(x);
+                             hijo.addHijo(y);
+                             hijo.addHijo(he);
+                             hijo.addHijo(diametro);
+                             return hijo;
+                        }
+}
+
+NodoArbol PINTAROR () :
+ {
+ NodoArbol hijo=new NodoArbol("PINTAR_OR");
+NodoArbol x=null;
+NodoArbol y=null;
+Token color;
+NodoArbol ancho=null;
+NodoArbol alto=null;
+Token figura;
+ } 
+{ 
+    <PINTAROR><PARA>x=OP() <COMA> y=OP() <COMA>color=<COLOR> <COMA>ancho=OP() <COMA> alto=OP()<COMA>figura=<FIGURA> <PARC> <DELIMITADOR>
+                        {
+                            String he=color.toString();
+                            he=he.replace("\"", "");                
+                             hijo.addHijo(x);
+                             hijo.addHijo(y);
+                             hijo.addHijo(he);
+                             hijo.addHijo(ancho);
+                             hijo.addHijo(alto);
+                             String hel=figura.toString();
+                            hel=hel.replace("\'", "");     
+                             hijo.addHijo(hel);
+                             return hijo;
+                        }
+}
+
+
+NodoArbol EMPTY () :
+ {
+ NodoArbol hijo=new NodoArbol("VACIO");
+ } 
+{ 
+    {return hijo;}
+}
+
+
+NodoArbol OP():
+{
+NodoArbol op1=null;
+NodoArbol op2=null;
+}
+{
+    op1=AND() (<OR> op2=AND()
+                                {
+                                    NodoArbol hijo=new NodoArbol("OR");
+                                    hijo.addHijo(op1);
+                                    hijo.addHijo(op2);
+                                    op1=hijo;
+                                }
+               |<XOR> op2=AND()
+                                {
+                                    NodoArbol hijo=new NodoArbol("XOR");
+                                    hijo.addHijo(op1);
+                                    hijo.addHijo(op2);
+                                    op1=hijo;
+                                }
+                |<NOR> op2=AND()
+                                {
+                                    NodoArbol hijo=new NodoArbol("NOR");
+                                    hijo.addHijo(op1);
+                                    hijo.addHijo(op2);
+                                    op1=hijo;
+                                }
+                )*
+                      {return op1;}
+}
+
+
+
+
+NodoArbol AND():
+{
+NodoArbol op1=null;
+NodoArbol op2=null;
+}
+{
+    op1=NOT() (<AND> op2=NOT()
+                                {
+                                    NodoArbol hijo=new NodoArbol("XOR");
+                                    hijo.addHijo(op1);
+                                    hijo.addHijo(op2);
+                                    op1=hijo;
+                                }
+              |<NAND> op2=NOT()
+                                {
+                                    NodoArbol hijo=new NodoArbol("XOR");
+                                    hijo.addHijo(op1);
+                                    hijo.addHijo(op2);
+                                    op1=hijo;
+                                }
+
+                )*
+                      {return op1;}
+}
+
+NodoArbol NOT():
+{
+NodoArbol op1=null;
+}
+{
+    <NOT> op1=RELA() 
+                            {
+                            NodoArbol hijo=new NodoArbol("NOT");
+                             hijo.addHijo(op1);
+                             return hijo;}
+ 
+   |op1=RELA(){return op1;}
+}
+
+
+
+NodoArbol RELA():
+{
+NodoArbol op1=null;
+NodoArbol op2=null;
+Token id;
+}
+{
+    op1=ARIT() (
+                <EQUIVALENCIA> op2=ARIT() 
+                                            {
+                                                NodoArbol hijo=new NodoArbol("==");
+                                                hijo.addHijo(op1);
+                                                hijo.addHijo(op2);
+                                                op1=hijo;
+                                            }
+                |<MENORIGUAL> op2=ARIT() 
+                                            {
+                                                NodoArbol hijo=new NodoArbol("<=");
+                                                hijo.addHijo(op1);
+                                                hijo.addHijo(op2);
+                                                op1=hijo;
+                                            }
+                |<MENORQ> op2=ARIT() 
+                                            {
+                                                NodoArbol hijo=new NodoArbol("<");
+                                                hijo.addHijo(op1);
+                                                hijo.addHijo(op2);
+                                                op1=hijo;
+                                            }
+                |<MAYORIGUAL> op2=ARIT()
+                                            {
+                                                NodoArbol hijo=new NodoArbol(">=");
+                                                hijo.addHijo(op1);
+                                                hijo.addHijo(op2);
+                                                op1=hijo;
+                                            }
+                |<MAYORQ> op2=ARIT()
+                                            {
+                                                NodoArbol hijo=new NodoArbol(">");
+                                                hijo.addHijo(op1);
+                                                hijo.addHijo(op2);
+                                                op1=hijo;
+                                            }
+                |<DISTINTO> op2=ARIT()
+                                            {
+                                                NodoArbol hijo=new NodoArbol("!=");
+                                                hijo.addHijo(op1);
+                                                hijo.addHijo(op2);
+                                                op1=hijo;
+                                            }
+
+                                                           
+        )*{return op1;}
+        |<NULO> id=<IDEN> {
+                            NodoArbol hijo=new NodoArbol("NULO");
+                            hijo.addHijo(id.toString());
+                            return hijo;
+                          }
+}
+
+
+
+NodoArbol ARIT():
+{
+NodoArbol op1=null;
+NodoArbol op2=null;
+}
+{
+    op1=MULDIV() (<PLUS> op2=MULDIV() 
+                                            {
+                                                    NodoArbol hijo=new NodoArbol("+");
+                                                    hijo.addHijo(op1);
+                                                    hijo.addHijo(op2);
+                                                    op1=hijo;
+                                            }
+    |<MINUS> op2=MULDIV()
+                                            {
+                                                    NodoArbol hijo=new NodoArbol("-");      
+                                                    hijo.addHijo(op1);
+                                                    hijo.addHijo(op2);
+                                                    op1=hijo;
+                                            }
+   )* {return op1;}
+                           
+}
+
+
+
+
+NodoArbol MULDIV():
+{
+NodoArbol op1=null;
+NodoArbol op2=null;
+}
+{
+    op1=POT() (<MULTIPLY> op2=POT() 
+                                            {
+                                                NodoArbol hijo=new NodoArbol("*");
+                                                    hijo.addHijo(op1);
+                                                    hijo.addHijo(op2);
+                                                    op1=hijo;
+                                            }
+    |<DIVIDE> op2=POT()
+                                            {
+                                                NodoArbol hijo=new NodoArbol("/");
+                                                    hijo.addHijo(op1);
+                                                    hijo.addHijo(op2);
+                                                    op1=hijo;
+                                            }
+   )* {return op1;}
+}
+
+
+NodoArbol POT():
+{
+NodoArbol op1=null;
+NodoArbol op2=null;
+}
+{
+    op1=VALOR() (<POT> op2=VALOR()
+                                            {
+                                                NodoArbol hijo=new NodoArbol("^");
+                                                    hijo.addHijo(op1);
+                                                    hijo.addHijo(op2);
+                                                    op1=hijo;
+                                            }
+   )* {return op1;}
+}
+
+
+
+
+NodoArbol VALOR():
+{
+Token nombre;
+Token id;
+NodoArbol operador=null;
+NodoArbol hijo=null;
+NodoArbol rel=null;
+NodoArbol arreglo=new NodoArbol("DIMENSION_ARREGLO");
+int op=0;
+}
+{
+   
+   nombre=<NUM>                                                         
+                 {
+                    NodoArbol padre=new NodoArbol("ENTERO");
+                     padre.addHijo(nombre.toString());
+                    
+                     return padre;}   
+
+                                                   
+  | id=<IDEN> {op=0;}[<PARA>rel=PARAMETROSVALOR()<PARC>
+                        {
+                         if(rel.getEtiqueta().equalsIgnoreCase("vacio")){
+                            hijo=new NodoArbol("LLAMADA_FUNM_SIN");
+                            hijo.addHijo(id.toString());
+                           // return hijo;
+                          }else{
+                            hijo=new NodoArbol("LLAMADA_FUNM_CON");
+                            hijo.addHijo(id.toString());
+                            hijo.addHijo(rel);
+                            //return hijo;
+                          }
+                          op=1;
+                        }
+
+                |<CORA>rel=OP()<CORC> {arreglo.addHijo(rel);} (<CORA>rel=OP()<CORC>{arreglo.addHijo(rel);})* 
+                        {
+                            hijo=new NodoArbol("LLAMADA_ARREGLO");
+                            hijo.addHijo(id.toString());
+                            hijo.addHijo(arreglo);
+                            hijo.addHijo(rel);
+                            //return hijo;
+                            op=2;
+                        }
+
+              ] {
+                    if(op==0){
+                            hijo=new NodoArbol("ID");
+                            hijo.addHijo(id.toString());
+                        }
+                        return hijo;
+                }
+  | nombre=<DECIMAL>                                                         
+                 {
+                    NodoArbol padre=new NodoArbol("DECIMAL");
+                     padre.addHijo(nombre.toString());
+                     return padre;}  
+  | nombre=<CADENA>                                                         
+                 {
+                    NodoArbol padre=new NodoArbol("CADENA");
+                    String hola=""+nombre;
+                    hola=hola.replace("\"", "");                
+                     padre.addHijo(""+hola);
+                     return padre;}  
+  | nombre=<CARAC>                                                         
+                 {
+                    NodoArbol padre=new NodoArbol("CHAR");
+                     padre.addHijo(nombre.toString());
+                     return padre;}       
+|nombre=<VERDADERO>                                                         
+                 {
+                    NodoArbol padre=new NodoArbol("VERDADERO");
+                     padre.addHijo(nombre.toString());
+                     return padre;}  
+|nombre=<FALSO>                                                         
+                 {
+                    NodoArbol padre=new NodoArbol("VERDADERO");
+                     padre.addHijo(nombre.toString());
+                     return padre;}  
+|<PARA>operador=OP()<PARC>
+	{
+		return operador;
+        }
+
+}
+

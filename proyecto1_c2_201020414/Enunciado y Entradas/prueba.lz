@@ -1,0 +1,20 @@
+publico lienzo prueba%
+
+conserva var entero  var1$
+var entero arreglo var2[3]$
+
+conserva entero suma (entero val1, entero val2) %
+retorna val1+val2$
+?
+
+resta(entero val1,entero val2)%
+var entero val3$
+val3= val1-val2$
+?
+
+principal () %
+resta(10,7)$
+
+?
+?
+
