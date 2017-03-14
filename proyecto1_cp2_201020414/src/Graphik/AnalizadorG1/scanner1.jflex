@@ -41,7 +41,7 @@ comentarioLinea="#"{1} ([^\r\n\t])+
 
 //lo utilizado es esto de abajo
 num  = {digito}+
-ent=[-]?{num}
+//ent=[-]?{num}
 deci = [-]?{num}+["."]{num}+
 
 id={caracter} ({caracter}|{num}|"_")*
@@ -59,6 +59,7 @@ comentario=({comentarioMultiple}|{comentarioLinea})
 
 
 "var"           {return new Symbol(sGF1.varL, yycolumn+1,yyline+1,new String(yytext()));}
+
 "entero"           {return new Symbol(sGF1.enteroL, yycolumn+1,yyline+1,new String(yytext()));}
 "decimal"           {return new Symbol(sGF1.decimalL, yycolumn+1,yyline+1,new String(yytext()));}
 "caracter"           {return new Symbol(sGF1.caracterL, yycolumn+1,yyline+1,new String(yytext()));}
@@ -71,7 +72,7 @@ comentario=({comentarioMultiple}|{comentarioLinea})
 "privado"           {return new Symbol(sGF1.privadoL, yycolumn+1,yyline+1,new String(yytext()));}
 
 
-"importar"           {return new Symbol(sGF1.import, yycolumn+1,yyline+1,new String(yytext()));}
+"importar"           {return new Symbol(sGF1.imports, yycolumn+1,yyline+1,new String(yytext()));}
 "als"           {return new Symbol(sGF1.alsL, yycolumn+1,yyline+1,new String(yytext()));}
 "llamar"           {return new Symbol(sGF1.llamarL, yycolumn+1,yyline+1,new String(yytext()));}
 "nuevo"           {return new Symbol(sGF1.newL, yycolumn+1,yyline+1,new String(yytext()));}
@@ -83,7 +84,6 @@ comentario=({comentarioMultiple}|{comentarioLinea})
 "inicio"           {return new Symbol(sGF1.mainL, yycolumn+1,yyline+1,new String(yytext()));}
 "incluir_hk"           {return new Symbol(sGF1.incluirHK, yycolumn+1,yyline+1,new String(yytext()));}
 
-"llamarhk"           {return new Symbol(sGF1.llamarHKL, yycolumn+1,yyline+1,new String(yytext()));}
 "si"           {return new Symbol(sGF1.ifL, yycolumn+1,yyline+1,new String(yytext()));}
 
 "sino"           {return new Symbol(sGF1.elseL, yycolumn+1,yyline+1,new String(yytext()));}
@@ -107,6 +107,8 @@ comentario=({comentarioMultiple}|{comentarioLinea})
 "dondecada"           {return new Symbol(sGF1.dondeCadaL, yycolumn+1,yyline+1,new String(yytext()));}
 "dondetodo"           {return new Symbol(sGF1.dondeTodoL, yycolumn+1,yyline+1,new String(yytext()));}
 "imprimir"           {return new Symbol(sGF1.printL, yycolumn+1,yyline+1,new String(yytext()));}
+"verdadero"           {return new Symbol(sGF1.verdad, yycolumn+1,yyline+1,new String(yytext()));}
+"falso"           {return new Symbol(sGF1.mentira, yycolumn+1,yyline+1,new String(yytext()));}
 
 "\."        {return new Symbol(sGF1.punto, yycolumn+1,yyline+1,new String(yytext()));}
 "("        {return new Symbol(sGF1.parA, yycolumn+1,yyline+1,new String(yytext()));}
@@ -153,11 +155,15 @@ comentario=({comentarioMultiple}|{comentarioLinea})
 {ext1}    {return new Symbol(sGF1.archivoGK, yycolumn+1,yyline+1,new String(yytext()));}
 {num}    {return new Symbol(sGF1.num, yycolumn+1,yyline+1,new String(yytext()));}
 {deci}    {return new Symbol(sGF1.decimal, yycolumn+1,yyline+1,new String(yytext()));}
-{id}    {return new Symbol(sGF1.id, yycolumn+1,yyline+1,new String(yytext()));}
+{ext2}    {return new Symbol(sGF1.extencion2, yycolumn+1,yyline+1,new String(yytext()));}
+{ext1}    {return new Symbol(sGF1.extension1, yycolumn+1,yyline+1,new String(yytext()));}
+
+
 {caracterC}    {return new Symbol(sGF1.caracter, yycolumn+1,yyline+1,new String(yytext()));}
 //{path}    {System.out.println("path -->" +yytext()); return new Symbol(sGF1.path, yycolumn+1,yyline+1,new String(yytext()));}
 //{arUlx}   {return new Symbol(sGF1.arTerminales, yycolumn+1,yyline+1,new String(yytext()));}
 {cadena}   {return new Symbol(sGF1.cadena, yycolumn+1,yyline+1,new String(yytext()));}
+{id}    {return new Symbol(sGF1.id, yycolumn+1,yyline+1,new String(yytext()));}
 {comentario}   {}
 
 

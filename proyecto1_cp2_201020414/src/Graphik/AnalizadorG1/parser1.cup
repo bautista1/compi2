@@ -1,4 +1,4 @@
-package fase1;
+package Graphik.AnalizadorG1;
 import java_cup.runtime.*;
 import java.util.LinkedList;
 //import lienzoBAT.ErrorSin;
@@ -33,142 +33,640 @@ action code
 
 :}
 /*Declaracion de simbolos terminales*/
-terminal varL,enteroL,decimalL,caracterL,cadenaL,boolL,vacioL;
-terminal publicoL,protegidoL,privadoL;
-terminal import,alsL,llamarL,newL,llamarhkL,heredaL,retornarL,mainL,incluirHK,llamarHKL;
-terminal ifL,elseL,switchL,caseL,defaultL,forL,whileL,doL;
-terminal continueL,breakL,graficar,voidL,columnaL,dondeL,dondeCadaL,dondeTodoL,printL;
+terminal String varL,enteroL,decimalL,caracterL,cadenaL,boolL,vacioL;
+terminal String publicoL,protegidoL,privadoL;
+terminal String imports,alsL,llamarL,newL,llamarhkL,heredaL,retornarL,mainL,incluirHK;
+terminal String ifL,elseL,switchL,caseL,defaultL,forL,whileL,doL;
+terminal String continueL,breakL,graficar,voidL,columnaL,dondeL,dondeCadaL,dondeTodoL,printL,verdad,mentira,extencion2;
 
 
-terminal punto,parA,parC,llaveA,llaveC,corA,corC;
-terminal coma,dosPuntos,asignacion,delimitador;
-terminal notLogico,yLogico,oLogico,xorLogico;
-terminal comparacion,distinto,mayorIgual,menorIgual,mayor,menor;
-terminal suma,resta,por,div,pot,mod,disminucion,aumento,indice,dolar,archivoGK;
-terminal num,decimal,id,caracter,cadena;
+terminal String punto,parA,parC,llaveA,llaveC,corA,corC;
+terminal String coma,dosPuntos,asignacion,delimitador;
+terminal String notLogico,yLogico,oLogico,xorLogico;
+terminal String comparacion,distinto,mayorIgual,menorIgual,mayor,menor;
+terminal String suma,resta,por,div,pot,mod,disminucion,aumento,indice,dolar,archivoGK;
+terminal String num,decimal,id,caracter,cadena;
 
 
 /*Declaracion de simbolos NO terminales*/
 
-non terminal Object INICIAL, IMPORTACIONES, IMPORTACION,IMPORTARHK,IMPORTHK,CREARALS,CUERPOSALS,CUERPOALS;
-non terminal Object VARIABLES, VARIABLE,LIDS,ATRIBUTOS,FUNCIONES,LPARAMETROS,CUERPOFUNCIONES,CUERPO,VISIBILIDAD;
+non terminal Object INICIAL, IMPORTACIONES, IMPORTACION,IMPORTARHK,IMPORTHK,CREARALS,DECASL,CUERPOSALS,CUERPOALS,TDATO,TVISIBLE;
+non terminal Object VARIABLES,LIDS,ATRIBUTOS,FUNCIONES,LPARAMETROS,CUERPOFUNCIONES,CUERPO,VISIBILIDAD,TVISIBILIDAD,CUERPOASL;
 non terminal Object RETORNO,VARIABLE,LLAMARFUNCION,PARAMETROSV,LLAMARHK,ASIGNACION,SI,SINO,SWITCH,CASOS,CASO,FOR,CONDICIONFOR,INCREMENTOFOR;
-non terminal Object WHILE,DOWHILE;
+non terminal Object WHILE,DOWHILE,VACIO,CUERPOTEMP;
+non terminal Object OP,VALOR,POT,MULTIPLICACION,ARITMETICO,RELACIONAL,NOT,AND,XOR;
 //************************************Asignacion de precedencias******************************************
 
 start with INICIAL;
 
-INICIAL ::= IMPORTACIONES IMPORTARHK
-{:
-
-:}
+INICIAL ::= IMPORTACIONES:r IMPORTARHK:r1 DECASL:r2
+                {:
+                    NodoArbol nodo=new NodoArbol("INICIAL");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);
+                    nodo.addHijo(r2);
+                    RESULT=nodo;
+                :} 
+;
 IMPORTACIONES::=IMPORTACIONES IMPORTACION
-            | IMPORTACION
+                {:
+                    r.addHijo(r1);
+                    RESULT=r;
+                :} 
+            | IMPORTACION:r
+                {:
+                    NodoArbol nodo=new NodoArbol("IMPORTAR_GH");
+                    nodo.addHijo(r);
+                    RESULT=nodo;
+                :} 
+             |VACIO:r{:RESULT0r;:}
             ;
 
-IMPORTACION:= import id archivoGK
+IMPORTACION::= imports id:r archivoGK
+                {:
+                    NodoArbol nodo=new NodoArbol("GH");
+                    nodo.addHijo(r);
+                    RESULT=nodo;
+                :} 
 ;
 
-IMPORTARHK::=LLAMADASHK IMPORTHK
-          | IMPORTHK
+IMPORTARHK::=IMPORTARHK:r IMPORTHK:r1
+                {:
+                    r.addHijo(r1);
+                    RESULT=r;
+                :} 
+          | IMPORTHK:r
+                {:
+                    NodoArbol nodo=new NodoArbol("IMPORTAR_KH");
+                    nodo.addHijo(r);
+                    RESULT=nodo;
+                :}  
+          |VACIO:r{:RESULT0r;:}
 ;
 
-IMPORTHK::=incluirHK id delimitador
+IMPORTHK::=incluirHK id:r delimitador
+                {:
+                    NodoArbol nodo=new NodoArbol("HK");
+                    nodo.addHijo(r);
+                    RESULT=nodo;
+                :}  
 ;
 
-CUERPOSALS::=CUERPOSALS CREARALS
-    |CREARALS
+DECASL::=DECASL:r CREARALS:r1
+                {:
+                    r.addHijo(r);
+                    RESULT=r;
+                :}  
+    |CREARALS:r
+                {:
+                    NodoArbol nodo=new NodoArbol("ALS");
+                    nodo.addHijo(r);
+                    RESULT=nodo;
+                :}  
 ;
 
 
-CREARALS::=alsL id dosPuntos TVISIBILIDAD llaveA CUERPOSALS llaveC
-          |alsL id heredaL id dosPuntos TVISIBILIDAD llaveA CUERPOSALS llaveC
+CREARALS::=alsL id:r dosPuntos TVISIBILIDAD:r1 llaveA CUERPOSALS:r2 llaveC
+                {:
+                    NodoArbol nodo=new NodoArbol("ALS_NORMAL");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);
+                    nodo.addHijo(r2);
+                    RESULT=nodo;
+                :}  
+          |alsL id:r heredaL id:r1 dosPuntos TVISIBILIDAD:r2 llaveA CUERPOSALS:r3 llaveC
+                {:
+                    NodoArbol nodo=new NodoArbol("ALS_HEREDADO");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);
+                    nodo.addHijo(r2);
+                    nodo.addHijo(r3);
+                    RESULT=nodo;
+                :}  
 ;
 
-CUERPOSALS::=CUERPOSALS CUERPOASL
-            |CUERPOASL
+CUERPOSALS::=CUERPOSALS:r CUERPOASL:r1
+                {:
+                    r.addHijo(r1);
+                    RESULT=r;
+                :}  
+            |CUERPOASL:r
+                {:
+                    NodoArbol nodo=new NodoArbol("FUNCIONES_DEL_ARCHIVO");
+                    nodo.addHijo(r);
+                    RESULT=nodo;
+                :}  
 ;
 
-CUERPOASL::=ATRIBUTOS
-            |FUNCIONES
+CUERPOASL::=ATRIBUTOS:r{:RESULT=r;:}
+            |FUNCIONES:r{:RESULT=r;:}
 ;
 
-ATRIBUTOS::=varL TDATO LIDS asignacion OP VISIBILIDAD delimitador
-          |varL TDATO LIDS VISIBILIDAD delimitador
+ATRIBUTOS::=varL TDATO:r LIDS:r1 asignacion OP:r2 VISIBILIDAD:r3 delimitador
+                {:
+                    NodoArbol nodo=new NodoArbol("DECLARACION_ATRIBUTOS_OP");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);
+                    nodo.addHijo(r2);
+                    nodo.addHijo(r3);
+                    RESULT=nodo;
+                :}   
+          |varL TDATO:r LIDS:r1 VISIBILIDAD:r2 delimitador
+                 {:
+                    NodoArbol nodo=new NodoArbol("DECLARACION_ATRIBUTOS");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);
+                    nodo.addHijo(r2);
+                    RESULT=nodo;
+                :}
 ;
 
-LIDS::=LIDS coma id
-      |id
+LIDS::=LIDS:r coma id:r1
+                {:
+                    r.addHijo(r1);
+                    RESULT=r;
+                :}
+      |id:r
+                {:
+                    NodoArbol nodo=new NodoArbol("IDS"); 
+                    nodo.addHijo(R);
+                    RESULT=nodo;
+                :}
+                
+;
+TDATO::=enteroL:r 
+                {:
+                    NodoArbol nodo=new NodoArbol("ENTERO"); 
+                    RESULT=nodo;
+                :}
+        |decimalL:r 
+                {:
+                    NodoArbol nodo=new NodoArbol("DOUBLE"); 
+                    RESULT=nodo;
+                :}
+        |caracterL:r 
+                {:
+                    NodoArbol nodo=new NodoArbol("CHAR"); 
+                    RESULT=nodo;
+                :}
+        |cadenaL:r 
+                {:
+                    NodoArbol nodo=new NodoArbol("STRING"); 
+                    RESULT=nodo;
+                :}
+        |boolL:r 
+                {:
+                    NodoArbol nodo=new NodoArbol("BOOL"); 
+                    RESULT=nodo;
+                :}
+        |vacioL:r 
+                {:
+                    NodoArbol nodo=new NodoArbol("VOID"); 
+                    RESULT=nodo;
+                :}
+        |id:r 
+                {:
+                    NodoArbol nodo=new NodoArbol("OBJETO"); 
+                    nodo.addHijo(r);
+                    RESULT=nodo;
+                :}
+;
+FUNCIONES::=TDATO:r id:r1 parA LPARAMETROS:r2 parC VISIBILIDAD:r3 llaveA CUERPOFUNCIONES:r4 llaveC
+                {:
+                    NodoArbol nodo=new NodoArbol("FUNCION_METODO"); 
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);
+                    nodo.addHijo(r2);
+                    nodo.addHijo(r3);
+                    nodo.addHijo(r4);
+                    RESULT=nodo;
+                :}
+            |vacioL mainL parA parC llaveA CUERPOFUNCIONES:r llaveC
+                {:
+                    NodoArbol nodo=new NodoArbol("PRINCIPAL"); 
+                    nodo.addHijo(r);
+                    RESULT=nodo;
+                :}
 ;
 
-FUNCIONES::=TDATO id parA LPARAMETROS parC VISIBILIDAD llaveA CUERPOFUNCIONES llaveC
-            |vacioL mainL parA parC llaveA CUERPOFUNCIONES llaveC
+VISIBILIDAD::= dosPuntos TVISIBLE:r
+                        {:RESULT=r;:}
+              |VACIO:r{:RESULT=r;:}
 ;
 
-VISIBILIDAD::= dosPuntos TVISIBLE
-              |VACIO
+TVISIBLE::=publicoL
+                {:
+                    NodoArbol nodo=new NodoArbol("PUBLICO");               
+                    RESULT=nodo;
+                :}
+            |protegidoL
+                {:
+                    NodoArbol nodo=new NodoArbol("PROTEGIDO");               
+                    RESULT=nodo;
+                :}
+            |privadoL
+                {:
+                    NodoArbol nodo=new NodoArbol("PRIVADO");               
+                    RESULT=nodo;
+                :}
 ;
-LPARAMETROS::=LPARAMETROS coma TDATO id
-              |TDATO id
-              |VACIO
+LPARAMETROS::=LPARAMETROS:r coma TDATO:r1 id:r2
+                {:
+                    NodoArbol nodo=new NodoArbol("PARAMETRO");
+                    nodo.addHijo(r1);
+                    nodo.addHijo(r2);
+                    r.addHijo(nodo);
+                    RESULT=r;
+                :}
+              |TDATO:r id:r1
+                {:
+                    NodoArbol nodo1=new NodoArbol("PARAMETROS");
+                    NodoArbol nodo=new NodoArbol("PARAMETRO");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);
+                    nodo1.addHijo(nodo);
+                    RESULT=nodo1;
+                :}
+              |VACIO:r{:RESULT=r;:}
 ;
-CUERPOFUNCIONES::=CUERPOFUNCIONES CUERPO
-                |CUERPO
-;
-
-CUERPO::=RETORNO
-                  |VARIABLE
-                  |LLAMARFUNCION
-                  |LLAMARHK
-                  |ASIGNACION
-                  |SI
-                  |SWITCH
-                  |FOR
-                  |WHILE
-                  |DOWHILE
-;
-
-DOWHILE::=doL llaveA CUERPOFUNCIONES llaveC whileL parA OP parC delimitador
-;
-WHILE::=whileL parA OP parC llaveA CUERPOFUNCIONES llaveC
-;
-FOR::= forL parA CONDICIONFOR dosPuntos OP dosPuntos INCREMENTOFOR parC llaveA CUERPOFUNCIONES llaveC
-;
-
-INCREMENTOFOR::=id disminucion
-                |id aumento
-;
-CONDICIONFOR::= TDATO id asignacion OP
-                |id asignacion OP
-;
-SWITCH::=switchL parA OP parC llaveA CASOS llaveC
-;
-CASOS::=CASOS CASO
-        |CASO
-;
-CASO::=caseL OP dosPuntos CUERPOFUNCIONES
-    |defaultL dosPuntos CUERPOFUNCIONES
-;
-SI::=ifL parA OP parC llaveA CUERPOFUNCIONES llaveC SINO
-;
-
-SINO::= elseL llaveA CUERPOFUNCIONES llaveC
-        |VACIO
-;
-ASIGNACION::= id asignacion OP delimitador
-;
-LLAMARHK::= llamarHk id parA PARAMETROSV parC delimitador
-;
-LLAMARFUNCION::=llamar id PARAMETROSV parA parC delimitador
-;
-PARAMETROSV::=PARAMETROSV coma OP
-              |OP
-              |VACIO
-;
-VARIABLE::=varL TDATO LIDS asignacion OP delimitador
-          |varL TDATO LIDS delimitador
-;
-RETORNO::=retornar OP delimitador
+CUERPOFUNCIONES::=CUERPOFUNCIONES:r CUERPO:r1
+                {:
+                    r.addHijo(r1);                 
+                    RESULT=r;
+                :}
+                |CUERPO:r 
+                {:
+                    NodoArbol nodo=new NodoArbol("CUERPO_FUNCIONES");
+                    nodo.addHijo(r);                
+                    RESULT=nodo;
+                :}
 ;
 
-eduardo luna
+CUERPOTEMP::=CUERPOFUNCIONES:r{:RESULT=r;:}
+            |continueL delimitador
+                {:
+                    NodoArbol nodo=new NodoArbol("CONTINUAR");                
+                    RESULT=nodo;
+                :}
+            |breakL delimitador 
+                {:
+                    NodoArbol nodo=new NodoArbol("BREAK");               
+                    RESULT=nodo;
+                :}
+                
+;
+CUERPO::=RETORNO:r{:RESULT=r;:}
+                  |VARIABLE:r{:RESULT=r;:}
+                  |LLAMARFUNCION:r{:RESULT=r;:}
+                  |LLAMARHK:r{:RESULT=r;:}
+                  |ASIGNACION:r{:RESULT=r;:}
+                  |SI:r{:RESULT=r;:}
+                  |SWITCH:r{:RESULT=r;:}
+                  |FOR:r{:RESULT=r;:}
+                  |WHILE:r{:RESULT=r;:}
+                  |DOWHILE:r{:RESULT=r;:}
+;
+
+DOWHILE::=doL llaveA CUERPOTEMP:r llaveC whileL parA OP:r1 parC delimitador
+                {:
+                    NodoArbol nodo=new NodoArbol("DO_WHILE");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);                 
+                    RESULT=nodo;
+                :}
+;
+WHILE::=whileL parA OP:r parC llaveA CUERPOTEMP:r1 llaveC
+                {:
+                    NodoArbol nodo=new NodoArbol("WHILE");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);                     
+                    RESULT=nodo;
+                :}
+;
+FOR::= forL parA CONDICIONFOR:r dosPuntos OP:r1 dosPuntos INCREMENTOFOR:r2 parC llaveA CUERPOTEMP:r3 llaveC
+                {:
+                    NodoArbol nodo=new NodoArbol("FOR");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);    
+                    nodo.addHijo(r2);                    
+                    nodo.addHijo(r3);                    
+                    RESULT=nodo;
+                :}
+;
+
+INCREMENTOFOR::=id:r disminucion
+                    {:
+                        NodoArbol nodo=new NodoArbol("--");
+                        nodo.addHijo(r);                   
+                        RESULT=nodo;
+                    :}
+                |id:r aumento
+                   {:
+                    NodoArbol nodo=new NodoArbol("++");
+                    nodo.addHijo(r);                    
+                    RESULT=nodo;
+                :}
+;
+CONDICIONFOR::= TDATO:r id:r1 asignacion OP:r2
+                  {:
+                    NodoArbol nodo=new NodoArbol("DECLARACION_VARIABLE_FOR");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);    
+                    nodo.addHijo(r2);                    
+                    RESULT=nodo;
+                :}
+                |id:r asignacion OP:r1
+                 {:
+                    NodoArbol nodo=new NodoArbol("ASIGNACION");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);                       
+                    RESULT=nodo;
+                :}
+;
+SWITCH::=switchL parA OP:r parC llaveA CASOS:r1 llaveC
+                {:
+                    NodoArbol nodo=new NodoArbol("SWITCH");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);                       
+                    RESULT=nodo;
+                :}
+;
+CASOS::=CASOS:r CASO:r1
+                {:
+                    r.addHijo(r1);                    
+                    RESULT=r;
+                :}
+        |CASO:r
+                {:
+                    NodoArbol nodo=new NodoArbol("CASOS");
+                    nodo.addHijo(r);                   
+                    RESULT=nodo;
+                :}
+;
+CASO::=caseL OP:r dosPuntos CUERPOTEMP:r1
+                {:
+                    NodoArbol nodo=new NodoArbol("CASO");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);                      
+                    RESULT=nodo;
+                :}
+    |defaultL dosPuntos CUERPOTEMP:r
+                {:
+                    NodoArbol nodo=new NodoArbol("DEFAULT");
+                    nodo.addHijo(r);                   
+                    RESULT=nodo;
+                :}
+;
+SI::=ifL parA OP:r parC llaveA CUERPOTEMP:r1 llaveC SINO:r2
+                {:
+                    NodoArbol nodo=new NodoArbol("IF");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);    
+                    nodo.addHijo(r2);                    
+                    RESULT=nodo;
+                :}  
+;
+
+SINO::= elseL llaveA CUERPOTEMP:r llaveC
+                {:
+                    NodoArbol nodo=new NodoArbol("SINO");
+                    nodo.addHijo(r);                    
+                    RESULT=nodo;
+                :}  
+        |VACIO:r {:RESULT=r;:}
+;
+ASIGNACION::= id:r asignacion OP:r1 delimitador
+                {:
+                    NodoArbol nodo=new NodoArbol("ASIGNACION_VARIABLE");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);                    
+                    RESULT=nodo;
+                :}  
+;
+LLAMARHK::= llamarhkL id:r parA PARAMETROSV:r1 parC delimitador
+                {:
+                    NodoArbol nodo=new NodoArbol("LLAMAR_FUNCION_HASKELL");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);                    
+                    RESULT=nodo;
+                :}  
+;
+LLAMARFUNCION::=llamarL id:r parA PARAMETROSV:r1  parC delimitador
+                {:
+                    NodoArbol nodo=new NodoArbol("LLAMAR_FUNCION");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);                    
+                    RESULT=nodo;
+                :}  
+;
+PARAMETROSV::=PARAMETROSV:r coma OP:r1
+                 {:
+                    r.addHijo(r1);
+                    RESULT=r;
+                :}
+              |OP:r
+                 {:
+                    NodoArbol nodo=new NodoArbol("PARAMETROSV");
+                    nodo.addHijo(r);
+                    RESULT=nodo;
+                :}
+              |VACIO:r{:RESULT=r;:}
+;
+VARIABLE::=varL TDATO:r LIDS:r1 asignacion OP:r2 delimitador
+                 {:
+                    NodoArbol nodo=new NodoArbol("DECLARACION_VARIABLE_OP");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);
+                    nodo.addHijo(r2);
+                    RESULT=nodo;
+                :}    
+          |varL TDATO:r LIDS:r1 delimitador
+                {:
+                    NodoArbol nodo=new NodoArbol("DECLARACION_VARIABLE");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);
+                    RESULT=nodo;
+                :}
+;
+RETORNO::=retornarL OP:r delimitador
+                {:
+                    NodoArbol nodo=new NodoArbol("retornar");
+                    nodo.addHijo(r);
+                    RESULT=nodo;
+                :}
+;
+
+OP::=OP:r oLogico XOR:r1
+                {:
+                    NodoArbol nodo=new NodoArbol("||");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);
+                    RESULT=nodo;
+                :}
+    |XOR:r{:RESULT=r;:}
+;
+
+XOR::=XOR:r xorLogico AND:r1
+                {:
+                    NodoArbol nodo=new NodoArbol("&|");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);
+                    RESULT=nodo;
+                :}
+    |AND:r{:RESULT=r;:}
+;
+
+AND::=AND:r yLogico NOT:r1
+                {:
+                    NodoArbol nodo=new NodoArbol("&&");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);
+                    RESULT=nodo;
+                :}
+     |NOT:r{:RESULT=r;:}
+;
+
+NOT::=notLogico RELACIONAL:r
+                {:
+                    NodoArbol nodo=new NodoArbol("!");
+                    nodo.addHijo(r);
+                    RESULT=nodo;
+                :}
+    |RELACIONAL:r{:RESULT=r;:}
+;
+
+RELACIONAL::=RELACIONAL:r comparacion ARITMETICO:r1
+                {:
+                    NodoArbol nodo=new NodoArbol("==");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);
+                    RESULT=nodo;
+                :}
+            |RELACIONAL:r distinto ARITMETICO:r1
+                {:
+                    NodoArbol nodo=new NodoArbol("!=");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);
+                    RESULT=nodo;
+                :}
+            |RELACIONAL:r mayorIgual ARITMETICO:r1
+                {:
+                    NodoArbol nodo=new NodoArbol(">=");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);
+                    RESULT=nodo;
+                :}
+            |RELACIONAL:r menorIgual ARITMETICO:r1
+                {:
+                    NodoArbol nodo=new NodoArbol("<=");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);
+                    RESULT=nodo;
+                :}
+            |RELACIONAL:r mayor ARITMETICO:r1
+                {:
+                    NodoArbol nodo=new NodoArbol(">");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);
+                    RESULT=nodo;
+                :}
+            |RELACIONAL:r menor ARITMETICO:r1
+                {:
+                    NodoArbol nodo=new NodoArbol("<");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);
+                    RESULT=nodo;
+                :}
+            |ARITMETICO:r{:RESULT=r;:}
+;
+
+ARITMETICO::=ARITMETICO suma MULTIPLICACION
+                {:
+                    NodoArbol nodo=new NodoArbol("+");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);
+                    RESULT=nodo;
+                :}
+            |ARITMETICO resta MULTIPLICACION
+                {:
+                    NodoArbol nodo=new NodoArbol("-");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);
+                    RESULT=nodo;
+                :}
+            |MULTIPLICACION:r{:RESULT=r;:}
+;
+
+MULTIPLICACION::=MULTIPLICACION:r por POT:r1
+                {:
+                    NodoArbol nodo=new NodoArbol("*");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);
+                    RESULT=nodo;
+                :}
+                |MULTIPLICACION:r div POT:r1
+                {:
+                    NodoArbol nodo=new NodoArbol("/");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);
+                    RESULT=nodo;
+                :}
+                |MULTIPLICACION:r mod POT:r1
+                {:
+                    NodoArbol nodo=new NodoArbol("%");
+                    nodo.addHijo(r);
+                    nodo.addHijo(r1);
+                    RESULT=nodo;
+                :}
+                
+                |POT:r{:RESULT=r;:}
+;
+
+POT::=POT:r pot VALOR:r1{:
+                NodoArbol nodo=new NodoArbol("^");
+                nodo.addHijo(r);
+                nodo.addHijo(r1);
+                RESULT=nodo;
+        :}
+    |VALOR:r{:RESULT=r;:}
+;
+
+VALOR::=decimal:r{:
+                    NodoArbol var=new NodoArbol("DOUBLE");
+                    var.addHijo(""+r);
+                    RESULT=var;
+                :}
+        |num:r{:
+                    NodoArbol var=new NodoArbol("ENTERO");
+                    var.addHijo(""+r);
+                    RESULT=var;
+                :}
+        |caracter:r{:
+                    NodoArbol var=new NodoArbol("CHAR");
+                    var.addHijo(""+r);
+                    RESULT=var;
+                :}
+        |cadena:r{:
+                    NodoArbol var=new NodoArbol("STRING");
+                    var.addHijo(""+r);
+                    RESULT=var;
+                :}
+        
+        |id:r{:
+                    NodoArbol var=new NodoArbol("IDEN");
+                    var.addHijo(""+r);
+                    RESULT=var;
+                :}
+
+        |verdad:r{:
+                    NodoArbol var=new NodoArbol("BOOL");
+                    var.addHijo(""+r);
+                    RESULT=var;
+                :}
+
+        |mentira:r{:
+                    NodoArbol var=new NodoArbol("BOOL");
+                    var.addHijo(""+r);
+                    RESULT=var;
+                :}
+;
