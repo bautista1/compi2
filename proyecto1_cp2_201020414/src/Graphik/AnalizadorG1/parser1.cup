@@ -50,25 +50,25 @@ terminal String num,decimal,id,caracter,cadena;
 
 /*Declaracion de simbolos NO terminales*/
 
-non terminal Object INICIAL, IMPORTACIONES, IMPORTACION,IMPORTARHK,IMPORTHK,CREARALS,DECASL,CUERPOSALS,CUERPOALS,TDATO,TVISIBLE;
-non terminal Object VARIABLES,LIDS,ATRIBUTOS,FUNCIONES,LPARAMETROS,CUERPOFUNCIONES,CUERPO,VISIBILIDAD,TVISIBILIDAD,CUERPOASL;
-non terminal Object RETORNO,VARIABLE,LLAMARFUNCION,PARAMETROSV,LLAMARHK,ASIGNACION,SI,SINO,SWITCH,CASOS,CASO,FOR,CONDICIONFOR,INCREMENTOFOR;
-non terminal Object WHILE,DOWHILE,VACIO,CUERPOTEMP;
-non terminal Object OP,VALOR,POT,MULTIPLICACION,ARITMETICO,RELACIONAL,NOT,AND,XOR;
+non terminal NodoArbol INICIAL, IMPORTACIONES, IMPORTACION,IMPORTARHK,IMPORTHK,CREARALS,DECASL,CUERPOSALS,CUERPOALS,TDATO,TVISIBLE;
+non terminal NodoArbol VARIABLES,LIDS,ATRIBUTOS,FUNCIONES,LPARAMETROS,CUERPOFUNCIONES,CUERPO,VISIBILIDAD,TVISIBILIDAD,CUERPOASL;
+non terminal NodoArbol RETORNO,VARIABLE,LLAMARFUNCION,PARAMETROSV,LLAMARHK,ASIGNACION,SI,SINO,SWITCH,CASOS,CASO,FOR,CONDICIONFOR,INCREMENTOFOR;
+non terminal NodoArbol WHILE,DOWHILE,VACIO,CUERPOTEMP,IMPRIMIR;
+non terminal NodoArbol OP,VALOR,POT,MULTIPLICACION,ARITMETICO,RELACIONAL,NOT,AND,XOR;
 //************************************Asignacion de precedencias******************************************
 
 start with INICIAL;
 
-INICIAL ::= IMPORTACIONES:r IMPORTARHK:r1 DECASL:r2
+INICIAL ::= DECASL:r2
                 {:
                     NodoArbol nodo=new NodoArbol("INICIAL");
-                    nodo.addHijo(r);
-                    nodo.addHijo(r1);
+                    //nodo.addHijo(r);
+                    //nodo.addHijo(r1);
                     nodo.addHijo(r2);
-                    RESULT=nodo;
+                    parser.raizG=nodo;
                 :} 
 ;
-IMPORTACIONES::=IMPORTACIONES IMPORTACION
+IMPORTACIONES::=IMPORTACIONES:r IMPORTACION:r1
                 {:
                     r.addHijo(r1);
                     RESULT=r;
@@ -79,10 +79,10 @@ IMPORTACIONES::=IMPORTACIONES IMPORTACION
                     nodo.addHijo(r);
                     RESULT=nodo;
                 :} 
-             |VACIO:r{:RESULT0r;:}
+             |{:NodoArbol nodo=new NodoArbol("VACIO");RESULT=nodo;:}
             ;
 
-IMPORTACION::= imports id:r archivoGK
+IMPORTACION::= imports id:r delimitador
                 {:
                     NodoArbol nodo=new NodoArbol("GH");
                     nodo.addHijo(r);
@@ -101,7 +101,7 @@ IMPORTARHK::=IMPORTARHK:r IMPORTHK:r1
                     nodo.addHijo(r);
                     RESULT=nodo;
                 :}  
-          |VACIO:r{:RESULT0r;:}
+          |{:NodoArbol nodo=new NodoArbol("VACIO");RESULT=nodo;:}
 ;
 
 IMPORTHK::=incluirHK id:r delimitador
@@ -126,7 +126,7 @@ DECASL::=DECASL:r CREARALS:r1
 ;
 
 
-CREARALS::=alsL id:r dosPuntos TVISIBILIDAD:r1 llaveA CUERPOSALS:r2 llaveC
+CREARALS::=alsL id:r  VISIBILIDAD:r1 llaveA CUERPOSALS:r2 llaveC
                 {:
                     NodoArbol nodo=new NodoArbol("ALS_NORMAL");
                     nodo.addHijo(r);
@@ -134,7 +134,7 @@ CREARALS::=alsL id:r dosPuntos TVISIBILIDAD:r1 llaveA CUERPOSALS:r2 llaveC
                     nodo.addHijo(r2);
                     RESULT=nodo;
                 :}  
-          |alsL id:r heredaL id:r1 dosPuntos TVISIBILIDAD:r2 llaveA CUERPOSALS:r3 llaveC
+          |alsL id:r heredaL id:r1  VISIBILIDAD:r2 llaveA CUERPOSALS:r3 llaveC
                 {:
                     NodoArbol nodo=new NodoArbol("ALS_HEREDADO");
                     nodo.addHijo(r);
@@ -189,7 +189,7 @@ LIDS::=LIDS:r coma id:r1
       |id:r
                 {:
                     NodoArbol nodo=new NodoArbol("IDS"); 
-                    nodo.addHijo(R);
+                    nodo.addHijo(r);
                     RESULT=nodo;
                 :}
                 
@@ -250,12 +250,13 @@ FUNCIONES::=TDATO:r id:r1 parA LPARAMETROS:r2 parC VISIBILIDAD:r3 llaveA CUERPOF
 ;
 
 VISIBILIDAD::= dosPuntos TVISIBLE:r
-                        {:RESULT=r;:}
-              |VACIO:r{:RESULT=r;:}
+                        {:System.out.println("visibilidad");RESULT=r;:}
+              |{:NodoArbol nodo=new NodoArbol("VACIO");RESULT=nodo;:}
 ;
 
 TVISIBLE::=publicoL
                 {:
+                    
                     NodoArbol nodo=new NodoArbol("PUBLICO");               
                     RESULT=nodo;
                 :}
@@ -287,7 +288,7 @@ LPARAMETROS::=LPARAMETROS:r coma TDATO:r1 id:r2
                     nodo1.addHijo(nodo);
                     RESULT=nodo1;
                 :}
-              |VACIO:r{:RESULT=r;:}
+              |{:NodoArbol nodo=new NodoArbol("VACIO");RESULT=nodo;:}
 ;
 CUERPOFUNCIONES::=CUERPOFUNCIONES:r CUERPO:r1
                 {:
@@ -325,8 +326,16 @@ CUERPO::=RETORNO:r{:RESULT=r;:}
                   |FOR:r{:RESULT=r;:}
                   |WHILE:r{:RESULT=r;:}
                   |DOWHILE:r{:RESULT=r;:}
+                  |IMPRIMIR:r{:RESULT=r;:}
 ;
 
+IMPRIMIR::=printL parA OP:r parC delimitador
+                {:
+                    NodoArbol nodo=new NodoArbol("IMPRIMIR");
+                    nodo.addHijo(r);                
+                    RESULT=nodo;
+                :}
+;
 DOWHILE::=doL llaveA CUERPOTEMP:r llaveC whileL parA OP:r1 parC delimitador
                 {:
                     NodoArbol nodo=new NodoArbol("DO_WHILE");
@@ -433,7 +442,7 @@ SINO::= elseL llaveA CUERPOTEMP:r llaveC
                     nodo.addHijo(r);                    
                     RESULT=nodo;
                 :}  
-        |VACIO:r {:RESULT=r;:}
+        |{:NodoArbol nodo=new NodoArbol("VACIO");RESULT=nodo;:}
 ;
 ASIGNACION::= id:r asignacion OP:r1 delimitador
                 {:
@@ -470,7 +479,7 @@ PARAMETROSV::=PARAMETROSV:r coma OP:r1
                     nodo.addHijo(r);
                     RESULT=nodo;
                 :}
-              |VACIO:r{:RESULT=r;:}
+              |{:NodoArbol nodo=new NodoArbol("VACIO");RESULT=nodo;:}
 ;
 VARIABLE::=varL TDATO:r LIDS:r1 asignacion OP:r2 delimitador
                  {:
@@ -580,14 +589,14 @@ RELACIONAL::=RELACIONAL:r comparacion ARITMETICO:r1
             |ARITMETICO:r{:RESULT=r;:}
 ;
 
-ARITMETICO::=ARITMETICO suma MULTIPLICACION
+ARITMETICO::=ARITMETICO:r suma MULTIPLICACION:r1
                 {:
                     NodoArbol nodo=new NodoArbol("+");
                     nodo.addHijo(r);
                     nodo.addHijo(r1);
                     RESULT=nodo;
                 :}
-            |ARITMETICO resta MULTIPLICACION
+            |ARITMETICO:r resta MULTIPLICACION:r1
                 {:
                     NodoArbol nodo=new NodoArbol("-");
                     nodo.addHijo(r);
@@ -670,3 +679,5 @@ VALOR::=decimal:r{:
                     RESULT=var;
                 :}
 ;
+
+

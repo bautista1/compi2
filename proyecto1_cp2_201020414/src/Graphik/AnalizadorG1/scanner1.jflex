@@ -67,7 +67,7 @@ comentario=({comentarioMultiple}|{comentarioLinea})
 "bool"           {return new Symbol(sGF1.boolL, yycolumn+1,yyline+1,new String(yytext()));}
 "vacio"           {return new Symbol(sGF1.vacioL, yycolumn+1,yyline+1,new String(yytext()));}
 
-"publico"           {return new Symbol(sGF1.publicoL, yycolumn+1,yyline+1,new String(yytext()));}
+"publico"           {System.out.println("publico");return new Symbol(sGF1.publicoL, yycolumn+1,yyline+1,new String(yytext()));}
 "protegido"           {return new Symbol(sGF1.protegidoL, yycolumn+1,yyline+1,new String(yytext()));}
 "privado"           {return new Symbol(sGF1.privadoL, yycolumn+1,yyline+1,new String(yytext()));}
 

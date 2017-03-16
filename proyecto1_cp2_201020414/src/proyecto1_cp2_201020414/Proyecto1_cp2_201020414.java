@@ -15,7 +15,8 @@ public class Proyecto1_cp2_201020414 {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+       pruebas pantallitaExample=new pruebas();
+       pantallitaExample.setVisible(true);
     }
     
 }
