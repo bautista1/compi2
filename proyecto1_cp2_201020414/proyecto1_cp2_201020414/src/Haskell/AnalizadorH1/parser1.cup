@@ -1,0 +1,1534 @@
+package fase1;
+import java_cup.runtime.*;
+import java.util.LinkedList;
+//import lienzoBAT.ErrorSin;
+import java_cup.runtime.Symbol;
+import arbol.*;
+//import lienzoBAT.Errores;
+//import proyecto1_201020414.pantalla;
+
+parser code
+{:
+public NodoArbol codigoG;
+public NodoArbol gramaticaG;
+public NodoArbol declaracionG;
+public NodoArbol raizG;
+/**Metodo al que se llama automáticamente ante algún error sintactico.*/
+public void syntax_error(Symbol s){
+System.out.println("No se pudo recuperar del error " + (s.right+1)+ "Columna "+s.left+". Identificador " + s.value + " no reconocido.");
+// pantalla.errorLexLienzo(String.valueOf(s.value),String.valueOf(s.left),String.valueOf(s.right+1),"Sintactico"); 
+
+}
+/**Metodo al que se llama en el momento en que ya no es posible una recuperación de errores.*/
+public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{
+System.out.println("No se pudo recuperar del error " + (s.right+1)+ "Columna "+s.left+". Identificador " + s.value + " no reconocido.");
+// pantalla.errorLexLienzo(String.valueOf(s.value),String.valueOf(s.left),String.valueOf(s.right+1),"Sintactico"); 
+}
+/*Metodo que uso para verificar si el color es repetido*/
+
+:}
+action code
+{:
+
+
+:}
+/*Declaracion de simbolos terminales*/
+terminal enteroL,doubleL,cadenaL,caracterL;
+terminal boolL,vacioL,nuevo,clasesL,falso,verdadero;
+terminal si,sino,interruptor,encaso,pordefecto,detener,continuar;
+terminal mientras,hacer,repite,hasta,para,ciclo,imprimir;
+terminal casteoInt,casteoDouble,casteoIString,casteoDString,casteoDI;
+terminal retorno,nulo,publico,privado,protegido;
+terminal importar,herencia,supeL,sobreescritura,este;
+
+terminal ideclaracion,fdeclaracion,ram,fingram,codigo,Ecodigo,termin,terminalfi;
+terminal no_terminal,terfin,tpoQ,ipoQw;
+terminal lista,listaR,preceden,precedenW,Easociatividad,asociatividadT;
+terminal asociacion,relaU,nombre,nameEnd,inici,begEnd,ini,iniE;
+
+terminal punto,parA,parC,llaveA,llaveC,corA,corC,pip;
+terminal coma,dosPuntos,asignacion,puntoComa;
+terminal negacion,yLogico,oLogico,xorLogico;
+terminal comparacion,distinto,mayorIgual,menorIgual,mayor,menor;
+terminal suma,resta,por,div,pot,incremento,decremento;
+terminal asociada,atributo,caracteristica,iop,fop;
+terminal num,decimal,id,caracter,path,arTerminales,cadena;
+
+
+
+
+/*Declaracion de simbolos NO terminales*/
+/* non terminal S,L,S1,S2,S3,S5,S6,S7,S8,S9,S10;
+non terminal Color S4;
+*/
+non terminal NodoArbol S,EDG;
+non terminal NodoArbol LENGUAJE_INTERNO_DECLARACION;
+non terminal NodoArbol TERMINALES,NOTERMINALES,TEMPORAL,PRECEDENCIA,ASOCIATIVIDAD,SIMBOLO_INICIAL;
+non terminal NodoArbol TERMINAL,RELLENO_NOTERMINALES,RELLENO_NOTERMINAL,LISTA_NOTERMINALES,LISTA_NOTERMINAL,LISTA_PRECEDENCIAS,LISTA_PRECEDENCIA;
+non terminal NodoArbol RELLENO_PRECEDENCIAS,RELLENO_PRECEDENCIA,ASOCIATIVIDADES,LISTA_ASOCIATIVIDADES,LISTA_ASOCIATIVIDA;
+
+non terminal NodoArbol LENGUAJE_INTERNO_GRAMATICA,LENGUAJE_GRAMATICA,GRAMATICAS,GRAMATICA,GRAMATICASE,GRAMATICASO,ACCIONES,ACCION,ACCION_VALORES,OPG,OPH;
+
+
+
+non terminal NodoArbol LENGUAJE_INTERNO_COD,SENTENCIAS,SENTENCIA,TDP,VARIABLES,LV,ARREGLOS,DIM,METODOS,PARV,PARM,CLASES;
+non terminal NodoArbol CUP,CU,INSTANCIA,IMP,AR,CI,IF,SINO,SWITCH,CSW,CASO,WHILE,DO_WHILE,REPEAT_UNTIL;
+non terminal NodoArbol FOR,LOOP,OP,OR,XOR,AND,OPR,OPA,TA;
+
+
+precedence left suma,resta;
+precedence left por,div;
+precedence left pot;
+precedence left incremento,decremento;
+
+precedence left oLogico;
+precedence left xorLogico;
+precedence left yLogico;
+precedence left negacion;
+
+precedence left llaveA,llaveC;
+precedence left corA,corC;
+precedence left parA,parC;
+
+
+
+/*Inicio de la gramatica*/
+start with S;
+
+S::=EDG:r
+        {:
+            parser.raizG=r;
+        :}
+;
+
+EDG::= ideclaracion LENGUAJE_INTERNO_DECLARACION:r {:parser.declaracionG=r;:} fdeclaracion  ram LENGUAJE_INTERNO_GRAMATICA:r1 {:parser.gramaticaG=r1;:} fingram codigo LENGUAJE_INTERNO_COD:r2 {: parser.codigoG=r2; :} Ecodigo
+        {:
+            NodoArbol edg=new NodoArbol("ARBOL_GENERAL");
+            edg.addHijo(r);
+            edg.addHijo(r1);
+            edg.addHijo(r2);
+            
+            RESULT=edg;
+        :}
+    ;
+
+LENGUAJE_INTERNO_DECLARACION::= TERMINALES:r NOTERMINALES:r1 PRECEDENCIA:r2 ASOCIATIVIDAD:r3 SIMBOLO_INICIAL:r4
+                            {:
+                                NodoArbol nodo=new NodoArbol("DECLARACION");
+                                nodo.addHijo(r);
+                                nodo.addHijo(r1);
+                                nodo.addHijo(r2);
+                                nodo.addHijo(r3);
+                                nodo.addHijo(r4);
+                                RESULT=nodo;
+                            :}
+                             
+;
+
+TERMINALES::=TERMINALES:r TERMINAL:r1
+                         {:
+                                r.addHijo(r1);
+                                RESULT=r;
+                            :}
+            |TERMINAL:r
+                            {:
+                                NodoArbol nodo=new NodoArbol("LISTA_TERMINALES");
+                                nodo.addHijo(r);
+                                RESULT=nodo;
+                            :}
+;
+
+TERMINAL::=termin arTerminales:r terminalfi
+                            {:
+                                NodoArbol nodo=new NodoArbol("ARCHIVO");
+                                nodo.addHijo(""+r);
+                                RESULT=nodo;
+                            :}
+;
+
+NOTERMINALES::=NOTERMINALES:r RELLENO_NOTERMINALES:r1
+                            {:
+                                r.addHijo(r1);
+                                RESULT=r;
+                            :}
+            |RELLENO_NOTERMINALES:r
+                            {:
+                                NodoArbol nodo=new NodoArbol("LISTA_NO_TERMINALES");
+                                nodo.addHijo(r);
+                                RESULT=nodo;
+                            :}
+;
+
+RELLENO_NOTERMINALES::=no_terminal RELLENO_NOTERMINAL:r terfin
+                            {:
+                                RESULT=r;
+                            :}
+;
+
+RELLENO_NOTERMINAL::=tpoQ TDP:r ipoQw lista LISTA_NOTERMINALES:r1 listaR
+                            {:
+                                NodoArbol nodo=new NodoArbol("NO_TERMINAL");
+                                nodo.addHijo(r);
+                                nodo.addHijo(r1);
+                                RESULT=nodo;
+                            :}
+;
+
+LISTA_NOTERMINALES::=LISTA_NOTERMINALES:r LISTA_NOTERMINAL:r1
+                        {:
+                                r.addHijo(r1);
+                                RESULT=r;
+                            :}
+                    |LISTA_NOTERMINAL:r
+                        {:
+                                NodoArbol nodo=new NodoArbol("NO_TERMINALES");
+                                nodo.addHijo(r);
+                                RESULT=nodo;
+                            :}
+;
+
+LISTA_NOTERMINAL::=nombre id:r nameEnd
+                    {:
+                                NodoArbol nodo=new NodoArbol("NOMBRE_TERMINAL");
+                                nodo.addHijo(""+r);
+                                RESULT=nodo;
+                            :}
+;
+
+PRECEDENCIA::=PRECEDENCIA:r LISTA_PRECEDENCIAS:r1
+                {:
+                               r.addHijo(r1);
+                                RESULT=r;
+                :}
+            |LISTA_PRECEDENCIAS:r
+                {:
+                                NodoArbol nodo=new NodoArbol("PRECEDENCIA");
+                               nodo.addHijo(r);
+                                RESULT=nodo;
+                :}
+;
+
+LISTA_PRECEDENCIAS::=preceden LISTA_PRECEDENCIA:r precedenW
+                            {:
+                                NodoArbol nodo=new NodoArbol("LISTA_PRECEDENCIA");
+                                nodo.addHijo(r);
+                                RESULT=nodo;
+                            :}
+;
+
+LISTA_PRECEDENCIA::=lista RELLENO_PRECEDENCIAS:r listaR
+                            {:
+                                NodoArbol nodo=new NodoArbol("RELLENO_PRECEDENCIA");
+                                nodo.addHijo(r);
+                                RESULT=nodo;
+                            :}
+;
+
+RELLENO_PRECEDENCIAS::=RELLENO_PRECEDENCIAS:r RELLENO_PRECEDENCIA:r1
+                                {:
+                                    r.addHijo(r1);
+                                    RESULT=r;
+                                :}
+                        |RELLENO_PRECEDENCIA:r
+                            {:
+                                RESULT=r;
+                            :}
+;
+
+RELLENO_PRECEDENCIA::=termin id:r terminalfi
+                             {:
+                                NodoArbol nodo=new NodoArbol("TERMINAL");
+                                nodo.addHijo(""+r);
+                                RESULT=nodo;
+                            :}
+;
+
+
+ASOCIATIVIDAD::=ASOCIATIVIDAD:r ASOCIATIVIDADES:r1
+                        {:
+                                
+                               r.addHijo(r1);
+                                RESULT=r;
+                        :}
+                |ASOCIATIVIDADES:r
+                    {:
+                                NodoArbol nodo=new NodoArbol("ASOCIATIVIDAD");
+                               nodo.addHijo(r);
+                                RESULT=nodo;
+                        :}
+;
+
+ASOCIATIVIDADES::=Easociatividad LISTA_ASOCIATIVIDADES:r asociatividadT
+                        {:
+                                NodoArbol nodo=new NodoArbol("LISTA_ASOCIATIVIDAD");
+                               nodo.addHijo(r);
+                                RESULT=nodo;
+                        :}
+;
+
+LISTA_ASOCIATIVIDADES::=LISTA_ASOCIATIVIDADES:r LISTA_ASOCIATIVIDA:r1
+                             {:
+                                    
+                                   r.addHijo(r1);
+                                    RESULT=r;
+                                :}
+                        |LISTA_ASOCIATIVIDA:r
+                            {:
+                                NodoArbol nodo=new NodoArbol("RELLENO_ASOCIATIVIDAD");
+                               nodo.addHijo(r);
+                                RESULT=nodo;
+                        :}
+;
+
+LISTA_ASOCIATIVIDA::=asociacion id:r relaU nombre id:r1 nameEnd
+                    {:
+                        NodoArbol nodo=new NodoArbol("ASOCIACION");
+                        nodo.addHijo(""+r);
+                        nodo.addHijo(""+r1);
+                        RESULT=nodo;
+                    :}
+;
+
+SIMBOLO_INICIAL::=inici ini id:r iniE begEnd
+                {:
+                        NodoArbol nodo=new NodoArbol("SIMBOLO_INICIAL");
+                        nodo.addHijo(""+r);
+                        RESULT=nodo;
+                :}
+;
+
+
+//comienza lo que es el lenguaje de la gramatica
+LENGUAJE_INTERNO_GRAMATICA::=LENGUAJE_INTERNO_GRAMATICA:r LENGUAJE_GRAMATICA:r1 puntoComa
+                    {:
+                        NodoArbol nodo=new NodoArbol("PRODUCCION");
+                        nodo.addHijo(r1);
+                        r.addHijo(r1);
+                        RESULT=r;
+                    :}
+                |LENGUAJE_GRAMATICA:r puntoComa
+                    {:
+                        NodoArbol nodo=new NodoArbol("LISTA_PRODUCCIONES");
+                        nodo.addHijo(r);
+                        RESULT=nodo;
+                    :}
+                ;
+
+LENGUAJE_GRAMATICA::=LENGUAJE_GRAMATICA:r pip GRAMATICAS:r1 
+                    {:
+                        NodoArbol nueva=new NodoArbol("NUEVA_PRODUCCION");
+                        nueva.addHijo(r1);
+                        r.addHijo(nueva);
+                        RESULT=r;
+                    :}
+                    |menor id:r mayor asociada GRAMATICAS:r1
+                     {:
+                        NodoArbol nodo=new NodoArbol("INICIO_PRODUCCION");
+                        nodo.addHijo(""+r);
+                        nodo.addHijo(r1);
+                        RESULT=nodo;
+                    :}
+;
+
+GRAMATICAS::=GRAMATICAS:r GRAMATICA:r1
+                    {:
+                        r.addHijo(r1);
+                        RESULT=r;
+                    :}
+            |GRAMATICA:r
+                {:
+                        NodoArbol nodo=new NodoArbol("TOKEN");
+                        nodo.addHijo(r);
+                        RESULT=nodo;
+                    :}
+         
+;
+
+
+GRAMATICA::=menor id:r mayor
+                    {:
+                        NodoArbol nodo=new NodoArbol("PRODUCCION_SIN_ACCION");
+                        nodo.addHijo(""+r);
+                        RESULT=nodo;
+                    :}
+           |menor id:r mayor ACCIONES:r1
+                    {:
+                        NodoArbol nodo=new NodoArbol("PRODUCCION_CON_ACCION");
+                        nodo.addHijo(""+r);
+                        nodo.addHijo(r1);
+                        RESULT=nodo;
+                    :}
+           
+;
+
+ACCIONES::=iop ACCION:r fop
+                    {:
+                        RESULT=r;
+                    :}
+;
+
+ACCION::=ACCION:r ACCION_VALORES:r1
+                     {:
+                        
+                        r.addHijo(r1);
+                        RESULT=r;
+                    :}
+        |ACCION_VALORES:r
+                    {:
+                        NodoArbol nodo=new NodoArbol("ACCION_VALORES");
+                        nodo.addHijo(r);
+                        RESULT=nodo;
+                    :}
+;
+
+ACCION_VALORES::=INSTANCIA:r
+                    {:
+                        RESULT=r;
+                    :}
+                |atributo punto id:r asignacion OPG:r1 puntoComa 
+                    {:
+                        NodoArbol nodo=new NodoArbol("PADRE_ASIGNACION");
+                        nodo.addHijo(""+r);
+                        nodo.addHijo(r1);
+                        RESULT=nodo;
+                    :}
+                |   id:r punto id:r1 parA PARV:r2 parC puntoComa
+                {:
+                   NodoArbol var=new NodoArbol("LLAMADA_OBJETOS_FUNCION_CON_PARAMETROS");
+                   var.addHijo(""+r);
+                   var.addHijo(""+r1);
+                   var.addHijo(r2);
+                   RESULT=var;
+               :}
+                |id:r punto id:r1 parA parC puntoComa
+               {:
+                   NodoArbol var=new NodoArbol("LLAMADA_OBJETOS_FUNCION_SIN_PARAMETROS");
+                   var.addHijo(""+r);
+                   var.addHijo(""+r1);               
+                   RESULT=var;
+               :}
+        
+;
+
+OPG::=OPG:r menor OPH:r1
+        {:
+                NodoArbol nodo=new NodoArbol("<");
+                nodo.addHijo(r);
+                nodo.addHijo(r1);
+                RESULT=nodo;
+        :}
+    |OPG:r mayor OPH:r1
+        {:
+                NodoArbol nodo=new NodoArbol(">");
+                nodo.addHijo(r);
+                nodo.addHijo(r1);
+                RESULT=nodo;
+        :}
+    |OPG:r comparacion OPH:r1
+        {:
+                NodoArbol nodo=new NodoArbol("==");
+                nodo.addHijo(r);
+                nodo.addHijo(r1);
+                RESULT=nodo;
+        :}
+    |OPH:r
+        {:
+                RESULT=r;
+        :}
+    
+;
+
+OPH::=OPH:r suma OPH:r1
+        {:
+                NodoArbol nodo=new NodoArbol("+");
+                nodo.addHijo(r);
+                nodo.addHijo(r1);
+                RESULT=nodo;
+        :}
+    |OPH:r por OPH:r1
+        {:
+                NodoArbol nodo=new NodoArbol("*");
+                nodo.addHijo(r);
+                nodo.addHijo(r1);
+                RESULT=nodo;
+        :}
+    |id:r
+        {:
+                NodoArbol var=new NodoArbol("ID");
+                var.addHijo(""+r);
+                RESULT=var;
+        :}
+    |id:r parA parC
+        {:
+                NodoArbol var=new NodoArbol("FUNCION_METODO_SIN_PARAMETROS");
+                var.addHijo(""+r);
+                RESULT=var;
+        :}
+    |id:r parA PARV:r1 parC
+        {:
+                NodoArbol var=new NodoArbol("FUNCION_METODO_CON_PARAMETROS");
+                var.addHijo(""+r);
+                var.addHijo(r1);
+                RESULT=var;
+        :}
+    |atributo punto id:r
+         {:
+            NodoArbol nodo=new NodoArbol("ATRIBUTO_NO_TERMINAL");
+            nodo.addHijo(""+r);
+            RESULT=nodo;
+        :}
+    |caracteristica num:r punto id:r1
+         {:
+            NodoArbol nodo=new NodoArbol("ATRIBUTO_TERMINAL");
+            nodo.addHijo(""+r);
+            nodo.addHijo(""+r1);
+            RESULT=nodo;
+        :}
+    |caracteristica num:r
+        {:
+            NodoArbol nodo=new NodoArbol("ATRIBUTO_TERMINAL");
+            nodo.addHijo(""+r);
+            RESULT=nodo;
+        :}
+    |id:r punto id:r1 parA PARV:r2 parC
+        {:
+            NodoArbol nodo=new NodoArbol("LLAMADA_OBJETOS_FUNCION_CON_PARAMETROS");
+            nodo.addHijo(""+r);
+            nodo.addHijo(""+r1);
+            nodo.addHijo(r2);
+            RESULT=nodo;
+        :}
+    |id:r punto id:r1 parA parC
+        {:
+            NodoArbol nodo=new NodoArbol("LLAMADA_OBJETOS_FUNCION_SIN_PARAMETROS");
+            nodo.addHijo(""+r);
+            nodo.addHijo(""+r1);
+            RESULT=nodo;
+        :}
+;
+
+
+////////////////////////////////////////////////////////////////////////////////
+//no tocar lo de aqui abajo funciona 
+
+LENGUAJE_INTERNO_COD::=LENGUAJE_INTERNO_COD:r CLASES:r1
+        {:
+           r.addHijo(r1);
+           RESULT=r;
+        :}
+    |CLASES:r
+         {:
+           NodoArbol a=new NodoArbol("CLASES");
+           a.addHijo(r);
+           RESULT=a;
+        :}
+;
+CLASES::=clasesL id:r llaveA dosPuntos CUP:r1 dosPuntos llaveC
+        {:
+            NodoArbol claseS=new NodoArbol("CLASE_SIMPLE");
+            claseS.addHijo(""+r);
+            claseS.addHijo(r1);
+            RESULT=claseS;
+        :}
+        |clasesL id:r herencia id:r1 llaveA dosPuntos CUP:r2 dosPuntos llaveC
+        {:
+            NodoArbol claseS=new NodoArbol("CLASE_EXTENDIDA");
+            claseS.addHijo(""+r);
+            claseS.addHijo(""+r1);
+            claseS.addHijo(r2);
+            RESULT=claseS;
+        :}
+;
+
+CUP::=IMP:r SENTENCIAS:r1
+     {:
+            NodoArbol cupi=new NodoArbol("IMPORTACION");
+            NodoArbol sen=new NodoArbol("SENTENCIAS");
+            sen.addHijo(r1);
+            NodoArbol impo=new NodoArbol("IMPORT");
+            impo.addHijo(r);
+            cupi.addHijo(sen);
+            cupi.addHijo(impo);
+            RESULT=cupi;
+     :}   
+    
+     |SENTENCIAS:r
+     {:
+            NodoArbol cupi=new NodoArbol("SENTENCIAS");
+            cupi.addHijo(r);
+            RESULT=cupi;
+     :}
+;
+
+SENTENCIAS::= SENTENCIAS:r SENTENCIA:r1
+            {:
+                r.addHijo(r1);
+                RESULT=r;
+            :}
+            |SENTENCIA:r
+            {:
+                NodoArbol sent=new NodoArbol("SENTENCIA");
+                sent.addHijo(r);
+                RESULT=sent;
+            :}
+;
+
+SENTENCIA::=VARIABLES:r
+            {:
+                
+                RESULT=r;
+            :}
+            |INSTANCIA:r
+            {:
+                
+                RESULT=r;
+            :}
+            |ARREGLOS:r
+            {:
+                
+                RESULT=r;
+            :}
+            |METODOS:r
+            {:
+               
+                RESULT=r;
+            :}
+            |id:r punto id:r1 parA PARV:r2 parC puntoComa
+            {:
+                NodoArbol var=new NodoArbol("LLAMADA_OBJETOS_FUNCION_CON_PARAMETROS");
+                var.addHijo(""+r);
+                var.addHijo(""+r1);
+                var.addHijo(r2);
+                RESULT=var;
+            :}
+             |id:r punto id:r1 parA parC puntoComa
+            {:
+                NodoArbol var=new NodoArbol("LLAMADA_OBJETOS_FUNCION_SIN_PARAMETROS");
+                var.addHijo(""+r);
+                var.addHijo(""+r1);               
+                RESULT=var;
+            :}
+            |id:r punto id:r1 asignacion OP:r2 puntoComa
+            {:
+                NodoArbol var=new NodoArbol("ASIGNACION_OBJETOS");
+                var.addHijo(""+r);
+                var.addHijo(""+r1);
+                var.addHijo(r2);
+                RESULT=var;
+            :}
+            |este punto id:r asignacion OP:r1 puntoComa
+            {:
+                NodoArbol var=new NodoArbol("THIS_OBJETOS");
+                var.addHijo(""+r);
+                var.addHijo(r1);
+                RESULT=var;
+            :}
+            |sobreescritura METODOS:r
+            {:
+                NodoArbol var=new NodoArbol("SOBREESCRITURA");
+                var.addHijo(r);
+                RESULT=var;
+            :}
+            |imprimir parA OP:r parC puntoComa
+            {:
+                NodoArbol var=new NodoArbol("IMPRIMIR");
+                var.addHijo(r);
+                RESULT=var;
+            :}
+            |supeL parA PARV:r parC puntoComa
+            {:
+                NodoArbol var=new NodoArbol("LLAMADA_CONSTRUCTOR_CON_PARAMETROS");
+                var.addHijo(r);
+                RESULT=var;
+            :}
+            supeL parA parC puntoComa
+            {:
+                NodoArbol var=new NodoArbol("LLAMADA_CONSTRUCTOR_SIN_PARAMETROS");
+                RESULT=var;
+            :}
+            |supeL punto id:r  parA PARV:r1 parC puntoComa
+            {:
+                NodoArbol var=new NodoArbol("AGARRAR_PADRE_VALOR");
+                var.addHijo(""+r);
+                var.addHijo(r1);
+                RESULT=var;
+            :}
+            |id:r asignacion OP:r1 puntoComa
+            {:
+                NodoArbol var=new NodoArbol("ASIGNACION");
+                var.addHijo(""+r);
+                var.addHijo(r1);
+                RESULT=var;
+            :}
+            
+;
+
+TDP::=enteroL:r
+            {:
+                NodoArbol var=new NodoArbol("ENTERO");
+                var.addHijo(""+r);
+                RESULT=var;
+            :}
+    |doubleL:r
+            {:
+                NodoArbol var=new NodoArbol("DOUBLE");
+                var.addHijo(""+r);
+                RESULT=var;
+            :}
+    |caracterL:r
+            {:
+                NodoArbol var=new NodoArbol("CARACTER");
+                var.addHijo(""+r);
+                RESULT=var;
+            :}
+    |boolL:r
+            {:
+                NodoArbol var=new NodoArbol("BOOL");
+                var.addHijo(""+r);
+                RESULT=var;
+            :}
+    |cadenaL:r
+            {:
+                NodoArbol var=new NodoArbol("CADENA");
+                var.addHijo(""+r);
+                RESULT=var;
+            :}
+    |vacioL:r
+            {:
+                NodoArbol var=new NodoArbol("VACIO");
+                var.addHijo(""+r);
+                RESULT=var;
+            :}
+;
+
+
+VARIABLES::=TDP:r LV:r1 puntoComa
+            {:
+                NodoArbol var=new NodoArbol("VARIABLE_SIMPLE");
+                var.addHijo(r);
+                var.addHijo(r1);
+                RESULT=var;
+            :}
+            |TDP:r LV:r1 asignacion OP:r2 puntoComa
+            {:
+                NodoArbol var=new NodoArbol("VARIABLE_ASIGNACION_SIMPLE");
+                var.addHijo(r);
+                var.addHijo(r1);
+                var.addHijo(r2);
+                RESULT=var;
+            :}
+            |TA:r TDP:r1 LV:r2 asignacion OP:r3 puntoComa
+            {:
+                NodoArbol var=new NodoArbol("VARIABLE_ASIGNACION_COMPUESTA");
+                var.addHijo(r);
+                var.addHijo(r1);
+                var.addHijo(r2);
+                var.addHijo(r3);
+                RESULT=var;
+            :}
+            |TA:r1 TDP:r2 LV:r3 puntoComa
+            {:
+                NodoArbol var=new NodoArbol("VARIABLE_COMPUESTA");
+                var.addHijo(r1);
+                var.addHijo(r2);
+                var.addHijo(r3);
+                RESULT=var;
+            :}
+            
+;
+
+LV::=LV:r coma id:r1
+    {:
+                r.addHijo(""+r1);
+                RESULT=r;
+    :}
+    |id:r
+    {:
+                NodoArbol var=new NodoArbol("LISTA_VARIABLES");
+                var.addHijo(""+r);
+                RESULT=var;
+    :}
+;
+
+ARREGLOS::=TA:r TDP:r1 id:r2 DIM:r3 asignacion OP:r4 puntoComa
+            {:
+                NodoArbol var=new NodoArbol("ARREGLOS_ASIGNACION_COMPUESTA");
+                var.addHijo(r);
+                var.addHijo(r1);
+                var.addHijo(""+r2);
+                var.addHijo(r3);
+                var.addHijo(r4);
+                RESULT=var;
+            :}
+           |TA:r TDP:r1 id:r2 DIM:r3 puntoComa
+           {:
+                NodoArbol var=new NodoArbol("ARREGLOS_COMPUESTA");
+                var.addHijo(r);
+                var.addHijo(r1);
+                var.addHijo(""+r2);
+                var.addHijo(r3);
+                RESULT=var;
+            :}
+           |TDP:r id:r1 DIM:r2 puntoComa
+            {:
+                NodoArbol var=new NodoArbol("ARREGLOS_SIMPLE");
+                var.addHijo(r);
+                var.addHijo(""+r1);
+                var.addHijo(r2);
+                RESULT=var;
+            :}
+           |TDP:r id:r1 DIM:r2 asignacion OP:r3 puntoComa
+           {:
+                NodoArbol var=new NodoArbol("ARREGLOS_ASIGNACION_SIMPLE");
+                var.addHijo(r);
+                var.addHijo(""+r1);
+                var.addHijo(r2);
+                var.addHijo(r3);
+                RESULT=var;
+            :}
+;
+
+DIM::=DIM:r corA OP:r1 corC
+    {:
+                r.addHijo(r1);
+                RESULT=r;
+    :}
+    |corA OP:r corC
+    {:
+                NodoArbol var=new NodoArbol("LISTA_ARREGLOS");
+                var.addHijo(r);
+                RESULT=var;
+    :}
+;
+
+
+METODOS::=TDP:r id:r1 parA parC llaveA dosPuntos CU:r2 dosPuntos llaveC
+            {:
+                NodoArbol var=new NodoArbol("FUNCION_SIMPLE_SIN_PARAMETROS");
+                var.addHijo(r);
+                var.addHijo(""+r1);
+                var.addHijo(r2);
+                RESULT=var;
+            :}
+        |TDP:r id:r1 parA PARM:r2 parC llaveA dosPuntos CU:r3 dosPuntos llaveC
+            {:
+                NodoArbol var=new NodoArbol("FUNCION_SIMPLE_CON_PARAMETROS");
+                var.addHijo(r);
+                var.addHijo(""+r1);
+                var.addHijo(r2);
+                var.addHijo(r3);
+                RESULT=var;
+            :}
+        |id:r parA parC llaveA dosPuntos CU:r1 dosPuntos llaveC
+            {:
+                NodoArbol var=new NodoArbol("METODO_SIMPLE_SIN_PARAMETROS");
+                var.addHijo(""+r);
+                var.addHijo(r1);
+                RESULT=var;
+            :}
+        |id:r parA PARM:r1 parC llaveA dosPuntos CU:r2 dosPuntos llaveC
+            {:
+                NodoArbol var=new NodoArbol("METODO_SIMPLE_CON_PARAMETROS");
+                var.addHijo(""+r);
+                var.addHijo(r1);
+                var.addHijo(r2);
+                RESULT=var;
+            :}
+        |TA:r TDP:r1 id:r2 parA parC llaveA dosPuntos CU:r3 dosPuntos llaveC
+            {:
+                NodoArbol var=new NodoArbol("FUNCION_COMPUESTO_SIN_PARAMETROS");
+                var.addHijo(r);
+                var.addHijo(r1);
+                var.addHijo(""+r2);
+                var.addHijo(r3);
+                RESULT=var;
+            :}
+        |TA:r TDP:r1 id:r2 parA PARM:r3 parC llaveA dosPuntos CU:r4 dosPuntos llaveC
+             {:
+                NodoArbol var=new NodoArbol("FUNCION_COMPUESTO_CON_PARAMETROS");
+                var.addHijo(r);
+                var.addHijo(r1);
+                var.addHijo(""+r2);
+                var.addHijo(r3);
+                var.addHijo(r4);
+                RESULT=var;
+            :}
+        |TA:r id:r1 parA parC llaveA dosPuntos CU:r2 dosPuntos llaveC
+            {:
+                NodoArbol var=new NodoArbol("METODO_COMPUESTO_SIN_PARAMETROS");
+                var.addHijo(r);
+                var.addHijo(""+r1);
+                var.addHijo(r2);    
+                RESULT=var;
+            :}
+        |TA:r id:r1 parA PARM:r2 parC llaveA dosPuntos CU:r3 dosPuntos llaveC
+            {:
+                NodoArbol var=new NodoArbol("METODO_COMPUESTO_CON_PARAMETROS");
+                var.addHijo(r);
+                var.addHijo(""+r1);
+                var.addHijo(r2);
+                var.addHijo(r3);
+                RESULT=var;
+            :}
+;
+
+PARM::=PARM:r coma TDP:r1 id:r2
+        {:
+            NodoArbol nodo1=new NodoArbol("PARAMETRO");
+             nodo1.addHijo(r1);
+             nodo1.addHijo(""+r2);
+            r.addHijo(nodo1);
+            RESULT=r;
+        :}
+    |TDP:r id:r1
+    {:
+        NodoArbol nodo=new NodoArbol("PARAMETROS");
+        NodoArbol nodo1=new NodoArbol("PARAMETRO");
+        nodo1.addHijo(r);
+        nodo1.addHijo(""+r1);
+        nodo.addHijo(nodo1);
+        RESULT=nodo;
+    :}
+;
+
+PARV::=PARV:r coma OP:r1
+        {:
+            r.addHijo(r1);
+            RESULT=r;
+        :}
+       |OP:r
+        {:
+            NodoArbol nodo=new NodoArbol("PARAMETROS_CON_VALOR");
+            nodo.addHijo(r);
+            RESULT=nodo;
+        :}
+;
+
+
+
+INSTANCIA::=id:r id:r1 asignacion nuevo id:r2 parA parC puntoComa
+        {:
+            NodoArbol nodo=new NodoArbol("INSTANCIA_SIN_PARAMETROS");
+            nodo.addHijo(""+r);
+            nodo.addHijo(""+r1);
+            nodo.addHijo(""+r2);
+            RESULT=nodo;
+        :}
+            |id:r id:r1 asignacion nuevo id:r2 parA PARV:r3 parC puntoComa
+        {:
+            NodoArbol nodo=new NodoArbol("INSTANCIA_CON_PARAMETROS");
+            nodo.addHijo(""+r);
+            nodo.addHijo(""+r1);
+            nodo.addHijo(""+r2);
+            nodo.addHijo(r3);
+            RESULT=nodo;
+        :}
+            |id:r id:r1 asignacion nulo puntoComa
+        {:
+            NodoArbol nodo=new NodoArbol("INSTANCIA_NULA");
+            nodo.addHijo(""+r);
+            nodo.addHijo(""+r1);
+            RESULT=nodo;
+        :}
+;
+
+TA::=publico:r
+        {:
+            NodoArbol nodo=new NodoArbol("PUBLICO");
+            nodo.addHijo(""+r);
+            RESULT=nodo;
+        :}
+    |privado:r
+        {:
+            NodoArbol nodo=new NodoArbol("PRIVADO");
+            nodo.addHijo(""+r);
+            RESULT=nodo;
+        :}
+    |protegido:r
+        {:
+            NodoArbol nodo=new NodoArbol("PROTEGIDO");
+            nodo.addHijo(""+r);
+            RESULT=nodo;
+        :}
+;
+
+CU::=CU:r CI:r1
+        {:
+            r.addHijo(r1);
+            RESULT=r;
+        :}
+    |CI:r
+         {:
+            NodoArbol nodo=new NodoArbol("CUERPO");
+            nodo.addHijo(r);
+            RESULT=nodo;
+        :}
+    
+;
+
+IMP::=importar AR:r puntoComa
+        {:
+            RESULT=r;
+        :}
+;
+
+
+AR::=AR:r coma path:r1
+        {:
+            r.addHijo(""+r1);
+            RESULT=r;
+        :}
+    |path:r
+        {:
+            NodoArbol nodo=new NodoArbol("IMPORTAR");
+            nodo.addHijo(""+r);
+            RESULT=nodo;
+        :}
+    
+;
+
+CI::=IF:r
+        {:
+            RESULT=r;
+        :}
+    |SWITCH:r
+        {:
+            RESULT=r;
+        :}
+    |WHILE:r
+        {:
+            RESULT=r;
+        :}
+    |DO_WHILE:r
+        {:
+            RESULT=r;
+        :}
+    |REPEAT_UNTIL:r
+        {:
+            RESULT=r;
+        :}
+    |FOR:r
+        {:
+            RESULT=r;
+        :}
+    |LOOP:r
+        {:
+            RESULT=r;
+        :}
+    |INSTANCIA:r
+            {:
+                RESULT=r;
+            :}
+    |imprimir parA OP:r parC puntoComa
+            {:
+                NodoArbol var=new NodoArbol("IMPRIMIR");
+                var.addHijo(r);
+                RESULT=var;
+            :}
+    |supeL parA PARV:r parC puntoComa
+            {:
+                NodoArbol var=new NodoArbol("LLAMADA_CONSTRUCTOR");
+                var.addHijo(r);
+                RESULT=var;
+            :}
+    |supeL punto id:r  parA PARV:r1 parC puntoComa
+            {:
+                NodoArbol var=new NodoArbol("AGARRAR_PADRE_VALOR");
+                var.addHijo(""+r);
+                var.addHijo(r1);
+                RESULT=var;
+            :}
+    |VARIABLES:r
+            {:
+                 RESULT=r;
+            :}
+    |ARREGLOS:r
+            {:
+                 RESULT=r;
+            :}
+    |retorno OP:r puntoComa
+            {:
+                 NodoArbol nodo=new NodoArbol("RETORNO");
+                 nodo.addHijo(r);
+                 RESULT=nodo;
+            :}
+    |id:r asignacion OP:r1 puntoComa
+            {:
+                NodoArbol var=new NodoArbol("ASIGNACION");
+                var.addHijo(""+r);
+                var.addHijo(r1);
+                RESULT=var;
+            :}
+    |detener puntoComa
+            {:
+                 NodoArbol nodo=new NodoArbol("BREAK");
+                 RESULT=nodo;
+            :}
+    |continuar puntoComa
+            {:
+                 NodoArbol nodo=new NodoArbol("CONTINUAR");
+                 RESULT=nodo;
+            :}
+
+
+
+
+
+
+
+     |id:r punto id:r1 parA PARV:r2 parC puntoComa
+            {:
+                NodoArbol var=new NodoArbol("LLAMADA_OBJETOS_FUNCION_CON_PARAMETROS");
+                var.addHijo(""+r);
+                var.addHijo(""+r1);
+                var.addHijo(r2);
+                RESULT=var;
+            :}
+     |id:r punto id:r1 parA parC puntoComa
+            {:
+                NodoArbol var=new NodoArbol("LLAMADA_OBJETOS_FUNCION_SIN_PARAMETROS");
+                var.addHijo(""+r);
+                var.addHijo(""+r1);               
+                RESULT=var;
+            :}
+     |id:r punto id:r1 asignacion OP:r2 puntoComa
+            {:
+                NodoArbol var=new NodoArbol("ASIGNACION_OBJETOS_PARAMETRO");
+                var.addHijo(""+r);
+                var.addHijo(""+r1);
+                var.addHijo(r2);
+                RESULT=var;
+            :}
+   
+        
+;
+
+IF::=si parA OP:r parC llaveA dosPuntos CU:r1 dosPuntos llaveC SINO:r2
+    {:
+        NodoArbol nodo=new NodoArbol("IF");
+        nodo.addHijo(r);
+        nodo.addHijo(r1);
+        nodo.addHijo(r2);
+        RESULT=nodo;
+    :}
+;
+
+SINO::=sino llaveA dosPuntos CU:r dosPuntos llaveC
+        {:
+                NodoArbol nodo=new NodoArbol("ELSE");
+                nodo.addHijo(r);
+                RESULT=nodo;
+        :}
+       |sino IF:r
+        {:
+                NodoArbol nodo=new NodoArbol("ELSE_IF");
+                nodo.addHijo(r);
+                RESULT=nodo;
+        :}
+       |
+        {:
+                NodoArbol nodo=new NodoArbol("NADA");
+                RESULT=nodo;
+        :}
+;
+
+SWITCH::=interruptor parA OP:r parC llaveA dosPuntos CSW:r1 dosPuntos llaveC
+        {:
+                NodoArbol nodo=new NodoArbol("SWITCH");
+                nodo.addHijo(r);
+                nodo.addHijo(r1);
+                RESULT=nodo;
+        :}
+;
+
+CSW::=CSW:r CASO:r1
+        {:
+                r.addHijo(r1);
+                RESULT=r;
+        :}
+      |CASO:r
+        {:
+                NodoArbol nodo=new NodoArbol("CASOS");
+                nodo.addHijo(r);
+                RESULT=nodo;
+        :}
+      
+;
+
+CASO::=encaso OP:r dosPuntos CU:r1
+       {:
+                NodoArbol nodo=new NodoArbol("CASO");
+                nodo.addHijo(r);
+                nodo.addHijo(r1);
+                RESULT=nodo;
+        :}
+      |pordefecto dosPuntos CU:r
+        {:
+                NodoArbol nodo=new NodoArbol("POR_DEFECTO");
+                nodo.addHijo(r);
+                RESULT=nodo;
+        :}
+;
+
+
+WHILE::=mientras parA OP:r parC llaveA dosPuntos CU:r1 dosPuntos llaveC
+        {:
+                NodoArbol nodo=new NodoArbol("WHILE");
+                nodo.addHijo(r);
+                nodo.addHijo(r1);
+                RESULT=nodo;
+        :}
+    
+;
+
+
+DO_WHILE::=hacer llaveA dosPuntos CU:r dosPuntos llaveC mientras parA OP:r1 parC puntoComa
+        {:
+                NodoArbol nodo=new NodoArbol("DO_WHILE");
+                nodo.addHijo(r);
+                nodo.addHijo(r1);
+                RESULT=nodo;
+        :}
+;
+
+REPEAT_UNTIL::=repite llaveA dosPuntos CU:r dosPuntos llaveC hasta parA OP:r1 parC puntoComa
+        {:
+                NodoArbol nodo=new NodoArbol("REPEAT_UNTIL");
+                nodo.addHijo(r);
+                nodo.addHijo(r1);
+                RESULT=nodo;
+        :}
+;
+
+FOR::=para parA id:r asignacion OP:r1 puntoComa OP:r2 puntoComa OP:r3 parC llaveA dosPuntos CU:r4 dosPuntos llaveC
+        {:
+                NodoArbol var=new NodoArbol("ASIGNACION");
+                var.addHijo(""+r);
+                var.addHijo(r1);
+                RESULT=var;
+
+                NodoArbol nodo=new NodoArbol("FOR");
+                nodo.addHijo(var);
+                nodo.addHijo(r2);
+                nodo.addHijo(r3);
+                nodo.addHijo(r4);
+                RESULT=nodo;
+        :}
+;
+
+LOOP::=ciclo llaveA dosPuntos CU:r dosPuntos llaveC
+        {:
+                NodoArbol nodo=new NodoArbol("LOOP");
+                nodo.addHijo(r);
+                RESULT=nodo;
+        :}
+;
+
+
+
+OP::=OP:r oLogico OP:r1
+        {:
+            NodoArbol nodo=new NodoArbol("||");
+             nodo.addHijo(r);
+             nodo.addHijo(r1);
+             RESULT=nodo;
+        :}
+    |OR:r
+        {:
+               
+                RESULT=r;
+        :}
+;
+
+OR::=OR:r xorLogico OR:r1
+        {:
+            NodoArbol nodo=new NodoArbol("??");
+             nodo.addHijo(r);
+             nodo.addHijo(r1);
+             RESULT=nodo;
+        :}
+    |XOR:r
+        {:
+               
+                RESULT=r;
+        :}
+;
+
+XOR::=XOR:r yLogico XOR:r1
+        {:
+             NodoArbol nodo=new NodoArbol("&&");
+             nodo.addHijo(r);
+             nodo.addHijo(r1);
+             RESULT=nodo;
+        :}
+    |AND:r
+        {:
+               
+                RESULT=r;
+        :}
+;
+
+AND::=negacion OPR:r
+        {:
+                NodoArbol nodo=new NodoArbol("¡");
+                nodo.addHijo(r);
+                RESULT=nodo;
+        :}
+    |OPR:r
+        {:
+              
+                RESULT=r;
+        :}
+;
+
+OPR::=OPR:r mayor OPA:r1
+        {:
+                NodoArbol nodo=new NodoArbol(">");
+                nodo.addHijo(r);
+                nodo.addHijo(r1);
+                RESULT=nodo;
+        :}
+    |OPR:r menor OPA:r1
+        {:
+                NodoArbol nodo=new NodoArbol("<");
+                nodo.addHijo(r);
+                nodo.addHijo(r1);
+                RESULT=nodo;
+        :}
+    |OPR:r mayorIgual OPA:r1
+        {:
+                NodoArbol nodo=new NodoArbol(">=");
+                nodo.addHijo(r);
+                nodo.addHijo(r1);
+                RESULT=nodo;
+        :}
+    |OPR:r menorIgual OPA:r1
+        {:
+                NodoArbol nodo=new NodoArbol("<=");
+                nodo.addHijo(r);
+                nodo.addHijo(r1);
+                RESULT=nodo;
+        :}
+    |OPR:r comparacion OPA:r1
+        {:
+                NodoArbol nodo=new NodoArbol("==");
+                nodo.addHijo(r);
+                nodo.addHijo(r1);
+                RESULT=nodo;
+        :}
+    |OPR:r distinto OPA:r1
+        {:
+                NodoArbol nodo=new NodoArbol("!=");
+                nodo.addHijo(r);
+                nodo.addHijo(r1);
+                RESULT=nodo;
+        :}
+    |OPA:r
+        {:
+                RESULT=r;
+        :}
+;
+
+
+OPA::=OPA:r suma OPA:r1
+         {:
+                NodoArbol nodo=new NodoArbol("+");
+                nodo.addHijo(r);
+                nodo.addHijo(r1);
+                RESULT=nodo;
+        :}
+     |OPA:r resta OPA:r1
+        {:
+                NodoArbol nodo=new NodoArbol("-");
+                nodo.addHijo(r);
+                nodo.addHijo(r1);
+                RESULT=nodo;
+        :}
+     |OPA:r por OPA:r1
+        {:
+                NodoArbol nodo=new NodoArbol("*");
+                nodo.addHijo(r);
+                nodo.addHijo(r1);
+                RESULT=nodo;
+        :}
+     |OPA:r div OPA:r1
+        {:
+                NodoArbol nodo=new NodoArbol("/");
+                nodo.addHijo(r);
+                nodo.addHijo(r1);
+                RESULT=nodo;
+        :}
+     |OPA:r pot OPA:r1
+        {:
+                NodoArbol nodo=new NodoArbol("^");
+                nodo.addHijo(r);
+                nodo.addHijo(r1);
+                RESULT=nodo;
+        :}
+     |OPA:r incremento
+        {:
+                NodoArbol nodo=new NodoArbol("++");
+                nodo.addHijo(r);
+                RESULT=nodo;
+        :}
+     |OPA:r decremento
+        {:
+                NodoArbol nodo=new NodoArbol("--");
+                nodo.addHijo(r);
+                RESULT=nodo;
+        :}
+     |num:r
+        {:
+                NodoArbol nodo=new NodoArbol("ENTERO");
+                nodo.addHijo(""+r);
+                RESULT=nodo;
+        :}
+     |decimal:r
+        {:
+                NodoArbol nodo=new NodoArbol("DECIMAL");
+                nodo.addHijo(""+r);
+                RESULT=nodo;
+        :}
+     |caracter:r
+        {:
+                NodoArbol nodo=new NodoArbol("CARACTER");
+                nodo.addHijo(""+r);
+                RESULT=nodo;
+        :}
+     |cadena:r
+        {:
+                NodoArbol nodo=new NodoArbol("CADENA");
+                String hola=""+r;
+                hola=hola.replace("\"", "");
+            
+                nodo.addHijo(""+hola);
+                RESULT=nodo;
+        :}
+     |este punto id:r parA PARV:r1 parC
+        {:
+                NodoArbol var=new NodoArbol("THIS_METODO_FUNCION_CON_PARAMETROS");
+                var.addHijo(""+r);
+                var.addHijo(r1);
+                RESULT=var;
+        :}
+     |este punto id:r parA parC
+        {:
+                NodoArbol var=new NodoArbol("THIS_METODO_FUNCION_SIN_PARAMETROS");
+                var.addHijo(""+r);
+                RESULT=var;
+        :}
+     |este punto id:r
+        {:
+                NodoArbol var=new NodoArbol("THIS_ATRIBUTO");
+                var.addHijo(""+r);
+                RESULT=var;
+        :}
+     |supeL punto id:r parA PARV:r1 parC
+        {:
+                NodoArbol var=new NodoArbol("LLAMADA_METODO_FUNCION_PARAMETROS");
+                var.addHijo(""+r);
+                var.addHijo(r1);
+                RESULT=var;
+        :}
+     |supeL punto id:r 
+        {:
+                NodoArbol var=new NodoArbol("LLAMADA_PARAMETROS");
+                var.addHijo(""+r);
+                RESULT=var;
+        :}
+     |id:r parA PARV:r1 parC
+        {:
+                NodoArbol var=new NodoArbol("FUNCION_METODO_CON_PARAMETROS");
+                var.addHijo(""+r);
+                var.addHijo(r1);
+                RESULT=var;
+        :}
+     |   id:r parA parC
+        {:
+                NodoArbol var=new NodoArbol("FUNCION_METODO_SIN_PARAMETROS");
+                var.addHijo(""+r);
+                RESULT=var;
+        :}
+     |llaveA OP:r llaveC
+        {:
+                NodoArbol var=new NodoArbol("LLAVES");
+                var.addHijo(r);
+                RESULT=var;
+        :}
+     |parA OP:r parC
+        {:
+                NodoArbol var=new NodoArbol("PARENTESIS");
+                var.addHijo(r);
+                RESULT=var;
+        :}
+     |corA OP:r corC
+        {:
+                NodoArbol var=new NodoArbol("CORCHETES");
+                var.addHijo(r);
+                RESULT=var;
+        :}
+     |falso
+        {:
+                NodoArbol var=new NodoArbol("FALSO");
+                RESULT=var;
+        :}
+     |verdadero
+        {:
+                NodoArbol var=new NodoArbol("VERDADERO");
+                RESULT=var;
+        :}
+     |id:r
+        {:
+                NodoArbol var=new NodoArbol("ID");
+                var.addHijo(""+r);
+                RESULT=var;
+        :}
+    |id:r punto id:r1 parA PARV:r2 parC
+        {:
+            NodoArbol var=new NodoArbol("LLAMADA_OBJETOS_FUNCION");
+            var.addHijo(""+r);
+            var.addHijo(""+r1);
+            var.addHijo(r2);
+            RESULT=var;
+        :}
+    |id:r punto id:r1 
+    {:
+        NodoArbol var=new NodoArbol("LLAMADA_OBJETOS_PARAMETRO");
+        var.addHijo(""+r);
+        var.addHijo(""+r1);
+      
+        RESULT=var;
+    :}
+    |casteoInt parA OP:r parC puntoComa 
+    {:
+        NodoArbol var=new NodoArbol("PARSEO_STRING_INT");
+        var.addHijo(r);
+        RESULT=var;
+    :}
+    |casteoDouble parA OP:r parC  
+    {:
+        NodoArbol var=new NodoArbol("PARSEO_STRING_DOUBLE");
+        var.addHijo(r);
+        RESULT=var;
+    :}
+    |casteoIString parA OP:r parC  
+    {:
+        NodoArbol var=new NodoArbol("PARSEO_INT_STRING");
+        var.addHijo(r);
+        RESULT=var;
+    :}
+    |casteoDString parA OP:r parC  
+    {:
+        NodoArbol var=new NodoArbol("PARSEO_DOUBLE_STRING");
+        var.addHijo(r);
+        RESULT=var;
+    :}
+    |casteoDI parA OP:r parC  
+    {:
+        NodoArbol var=new NodoArbol("PARSEO_DOUBLE_INT");
+        var.addHijo(r);
+        RESULT=var;
+    :}
+
+;
+

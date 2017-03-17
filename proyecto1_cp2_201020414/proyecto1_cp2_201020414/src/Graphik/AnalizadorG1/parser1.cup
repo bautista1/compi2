@@ -55,7 +55,6 @@ non terminal NodoArbol VARIABLES,LIDS,ATRIBUTOS,FUNCIONES,LPARAMETROS,CUERPOFUNC
 non terminal NodoArbol RETORNO,VARIABLE,LLAMARFUNCION,PARAMETROSV,LLAMARHK,ASIGNACION,SI,SINO,SWITCH,CASOS,CASO,FOR,CONDICIONFOR,INCREMENTOFOR;
 non terminal NodoArbol WHILE,DOWHILE,VACIO,CUERPOTEMP,IMPRIMIR;
 non terminal NodoArbol OP,VALOR,POT,MULTIPLICACION,ARITMETICO,RELACIONAL,NOT,AND,XOR;
-non terminal NodoArbol ASIGARR,DIMARS,ARREGLOS,VALD;
 //************************************Asignacion de precedencias******************************************
 
 start with INICIAL;
@@ -161,42 +160,8 @@ CUERPOSALS::=CUERPOSALS:r CUERPOASL:r1
 
 CUERPOASL::=ATRIBUTOS:r{:RESULT=r;:}
             |FUNCIONES:r{:RESULT=r;:}
-            |ARREGLOS:r{:RESULT=r;:}
 ;
 
-ARREGLOS::=varL TDATO:r id:r1 DIMARS:r2 asignacion llaveA ASIGARR:r3 llaveC VISIBILIDAD:r4 delimitador
-                {:
-                    NodoArbol nodo=new NodoArbol("DECLARACION_ATRIBUTOS_ARR_OP");
-                    nodo.addHijo(r);
-                    nodo.addHijo(r1);
-                    nodo.addHijo(r2);
-                    nodo.addHijo(r3);
-                    nodo.addHijo(r4);
-                    RESULT=nodo;
-                :}  
-            |varL TDATO:r id:r1 DIMARS:r2 VISIBILIDAD:r3 delimitador  
-                {:
-                    NodoArbol nodo=new NodoArbol("DECLARACION_ATRIBUTOS_ARR_OP");
-                    nodo.addHijo(r);
-                    nodo.addHijo(r1);
-                    nodo.addHijo(r2);
-                    nodo.addHijo(r3);
-                    RESULT=nodo;
-                :}
-;
-
-DIMARS::=DIMARS:r corA OP:r1 corC
-                {:
-                    r.addHijo(r1);
-                    RESULT=r;
-                :} 
-        |corA OP:r corC
-                {:
-                    NodoArbol nodo=new NodoArbol("DIMS_AAREGLO");
-                    nodo.addHijo(r);
-                    RESULT=nodo;
-                :} 
-;
 ATRIBUTOS::=varL TDATO:r LIDS:r1 asignacion OP:r2 VISIBILIDAD:r3 delimitador
                 {:
                     NodoArbol nodo=new NodoArbol("DECLARACION_ATRIBUTOS_OP");
@@ -285,7 +250,7 @@ FUNCIONES::=TDATO:r id:r1 parA LPARAMETROS:r2 parC VISIBILIDAD:r3 llaveA CUERPOF
 ;
 
 VISIBILIDAD::= dosPuntos TVISIBLE:r
-                        {:RESULT=r;:}
+                        {:System.out.println("visibilidad");RESULT=r;:}
               |{:NodoArbol nodo=new NodoArbol("VACIO");RESULT=nodo;:}
 ;
 
@@ -692,10 +657,8 @@ VALOR::=decimal:r{:
                 :}
         |cadena:r{:
                     NodoArbol var=new NodoArbol("STRING");
-                    String hola=""+r;
-                    hola=hola.replace("\"", "");
-            
-                    var.addHijo(""+hola);
+                    r=r.replace("\"", "");      
+                    var.addHijo(""+r);
                     RESULT=var;
                 :}
         
@@ -716,33 +679,6 @@ VALOR::=decimal:r{:
                     var.addHijo(""+r);
                     RESULT=var;
                 :}
-        
 ;
 
-ASIGARR::=ASIGARR:r coma VALD:r1
-                {:
-                        r.addHijo(r1);
-                        RESULT=r;
-                :}
-       |VALD:r
-                {:
-                    NodoArbol var=new NodoArbol("ASIGNACION_DIM_ARREGLO");
-                    var.addHijo(r);
-                    RESULT=var;
-                :}
-;
-
-VALD::=llaveA ASIGARR:r llaveC
-                {:
-                    NodoArbol var=new NodoArbol("NUEVA_DIM_ARREGLO");
-                    var.addHijo(r);
-                    RESULT=var;
-                :}
-        |OP:r
-                {:
-                    NodoArbol var=new NodoArbol("OPERACION_ARREGLO");
-                    var.addHijo(r);
-                    RESULT=var;
-                :}
-        ;
 
